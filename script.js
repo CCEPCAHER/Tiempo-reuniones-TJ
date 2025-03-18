@@ -417,3 +417,10 @@ document.getElementById("president-name").addEventListener("input", function() {
     el.textContent = presidentName;
   });
 });
+// Inicia la aplicación al cargar el DOM
+window.addEventListener('DOMContentLoaded', initializeApp);
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log("Service Worker registrado"))
+    .catch(err => console.log("Error en Service Worker:", err));
+}
