@@ -1,0 +1,319 @@
+/* EVITAR ZOOM EN MÓVILES */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  font-family: "Arial", sans-serif;
+  background: #fdfdfd;
+  color: #333;
+  line-height: 1.4;
+  touch-action: manipulation;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  border-left: 6px solid #333;
+}
+
+/* TÍTULO */
+h1 {
+  text-align: center;
+  font-size: 26px;
+  color: #444;
+  margin-bottom: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* PRESIDENTE */
+.president-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.president-section label {
+  margin-right: 8px;
+}
+.president-section input {
+  width: 200px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  touch-action: manipulation;
+}
+
+/* CONTROLES PRINCIPALES */
+.meeting-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.main-control-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 18px;
+  background: linear-gradient(45deg, #b71c1c, #880e4f);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+.main-control-btn:hover {
+  opacity: 0.9;
+}
+
+/* RELOJ FLOTANTE */
+#floating-clock {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 999;
+  padding: 8px 12px;
+  background: #333;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 18px;
+  touch-action: manipulation;
+}
+
+/* SECCIONES */
+section {
+  margin-bottom: 24px;
+  padding: 12px;
+  border-left: 4px solid #ddd;
+  border-radius: 4px;
+  background: #f7f7f7;
+}
+section h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #222;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+/* Información de Bloque */
+.block-time-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+/* Fondos asimétricos por bloque */
+#block-0 { background: #fff9c4; }
+#block-1 { background: #e1f5fe; }
+#block-2 { background: #f1f8e9; }
+#block-2a { background: #fff3e0; }
+#block-3 { background: #fce4ec; }
+#block-4 { background: #ede7f6; }
+#block-5 { background: #ffebee; }
+
+/* ENCABEZADO DE SECCIÓN */
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.section-header label {
+  font-weight: bold;
+  font-size: 14px;
+}
+.section-header input.section-title {
+  flex: 1;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  touch-action: manipulation;
+}
+.allocated-fixed {
+  font-size: 14px;
+  padding: 6px;
+  color: #555;
+}
+
+/* INPUT DE TIEMPO (SEGUNDOS) */
+.allocated-input {
+  width: 60px;
+  padding: 4px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  touch-action: manipulation;
+}
+
+/* CAMPOS DE HORARIO */
+.start-time,
+.end-time {
+  width: 70px;
+  padding: 4px;
+  font-size: 14px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: #eee;
+  color: #555;
+  text-align: center;
+}
+
+/* DISPLAY DEL TEMPORIZADOR */
+.timer-display {
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+.time-main {
+  font-size: 50px;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 8px;
+}
+.time-diff {
+  font-size: 16px;
+  display: inline-block;
+  width: 70px;
+  text-align: center;
+  margin-left: 8px;
+}
+
+/* BOTONES DE SECCIÓN */
+.section-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.section-controls button {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.start-btn { background: #4caf50; }
+.pause-btn { background: #ff9800; }
+.reset-btn { background: #d32f2f; }
+.start-btn:hover, .pause-btn:hover, .reset-btn:hover {
+  opacity: 0.9;
+}
+
+/* COMENTARIOS */
+.comment-container {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #aaa;
+}
+.comment-container h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+.comment-container .comment-input {
+  margin-bottom: 8px;
+}
+.comment-container input {
+  width: 100%;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  touch-action: manipulation;
+}
+.comment-controls {
+  display: flex;
+  gap: 8px;
+}
+.comment-controls button {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  background: #0288d1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.comment-controls button:hover {
+  background: #0277bd;
+}
+.comment-list {
+  list-style: none;
+  margin-top: 8px;
+  padding: 0;
+}
+.comment-list li {
+  padding: 6px;
+  font-size: 14px;
+  background: #e3f2fd;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+/* SECCIONES DE CONSEJO */
+.consejo {
+  border: 2px dashed #1976d2;
+  background-color: #bbdefb;
+  margin-top: 8px;
+}
+.consejo .section-header label.section-title {
+  color: #0d47a1;
+  font-size: 15px;
+}
+
+/* BOTÓN PARA GENERAR PDF */
+.report {
+  text-align: center;
+  margin-top: 16px;
+}
+#generate-pdf {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background: #9c27b0;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#generate-pdf:hover {
+  opacity: 0.9;
+}
+
+/* ALERTAS */
+.red { color: #d32f2f; }
+.green { color: #388e3c; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { padding: 8px; }
+  h1 { font-size: 22px; }
+  .time-main { font-size: 60px; }
+  #floating-clock { font-size: 18px; padding: 8px; }
+  .allocated-input { width: 50px; font-size: 12px; }
+  .section-controls button { font-size: 12px; padding: 6px; }
+}
