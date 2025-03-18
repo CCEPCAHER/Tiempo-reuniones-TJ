@@ -266,7 +266,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     doc.setFillColor(200, 230, 201);
     doc.rect(margin, y, colWidth, rowHeight, 'F');
     doc.setTextColor(0, 0, 0);
-    doc.text(`Asignado: ${formatTime(allocated)}`, margin + 2, y + 6);
+    doc.text(`Tiempo: ${formatTime(allocated)}`, margin + 2, y + 6);
     // Columna "Real" (fondo azul claro)
     doc.setFillColor(187, 222, 251);
     doc.rect(margin + colWidth, y, colWidth, rowHeight, 'F');
@@ -299,9 +299,9 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         let respElem = sec.querySelector(".responsible-input");
         let responsible = respElem ? respElem.value || "N/A" : "N/A";
         doc.setFontSize(12);
-        doc.text(`Participación: ${title}`, margin, y);
+        doc.text(`Título: ${title}`, margin, y);
         y += 6;
-        doc.text(`Responsable: ${responsible}`, margin, y);
+        doc.text(`asignado: ${responsible}`, margin, y);
         y += 6;
         
         // Imprimir fila de tiempos
