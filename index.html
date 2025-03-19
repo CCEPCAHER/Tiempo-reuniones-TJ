@@ -13,15 +13,16 @@
 </head>
 <body>
   <div class="container">
+    <!-- Bloque: Título de la reunión -->
     <h1>Programa de Reuniones San Adrian</h1>
-    
-    <!-- Apartado para el nombre del presidente -->
+
+    <!-- Bloque: Presidente -->
     <div class="president-section">
       <label for="president-name">Presidente de la reunión:</label>
       <input type="text" id="president-name" placeholder="Nombre del presidente">
     </div>
-    
-    <!-- Controles principales -->
+
+    <!-- Bloque: Controles principales -->
     <div class="meeting-controls">
       <button id="meeting-start-button" class="main-control-btn">
         <i class="fas fa-play-circle"></i> Iniciar Reunión Completa
@@ -30,11 +31,10 @@
         <i class="fas fa-clock"></i> <span id="global-timer">00:00</span>
       </div>
     </div>
-    
-    <!-- Block 0a: Introducción – Canción y oración (5 min = 300 seg) -->
+
+    <!-- Bloque 0a: Introducción – Canción y oración (5 min = 300 seg) -->
     <section id="block-0a">
       <h2>Canción y oración (5 min)</h2>
-      
       <div class="section" data-block-index="0a" data-section-index="0" data-allocated="300">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Canción y Oración">
@@ -45,7 +45,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-0a-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-0a-0">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -53,11 +55,10 @@
         </div>
       </div>
     </section>
-    
-    <!-- Block 0b: Introducción – Palabras de introducción (1 min) -->
+
+    <!-- Bloque 0b: Introducción – Palabras de introducción (1 min) -->
     <section id="block-0b">
       <h2>Palabras de introducción (1 min)</h2>
-      
       <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Palabras de introducción">
@@ -68,7 +69,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-0b-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-0b-0">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -76,11 +79,11 @@
         </div>
       </div>
     </section>
-    
-    <!-- Block 1: Tesoros de la Biblia (10 min) -->
+
+    <!-- Bloque 1: Tesoros de la Biblia (10 min) -->
     <section id="block-1">
       <h2>Tesoros de la Biblia (10 min)</h2>
-     
+      
       <!-- Sección 1: Orador (tiempo fijo: 600 seg) -->
       <div class="section" data-block-index="1" data-section-index="0" data-allocated="600">
         <div class="section-header">
@@ -93,7 +96,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-1-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-1-0">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -114,7 +119,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-1-1">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-1-1">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -125,6 +132,7 @@
           <h4>Comentarios del Auditorio (30 seg cada uno)</h4>
           <div class="comment-input">
             <label>Nombre:</label>
+            <!-- Corregido: se usa "comment-name" sin el punto -->
             <input type="text" class="comment-name" placeholder="Nombre del comentador">
           </div>
           <div class="timer-display comment-timer">00:00</div>
@@ -151,7 +159,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-1-2">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-1-2">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -168,7 +178,9 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-1-3">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-1-3">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -176,10 +188,11 @@
         </div>
       </div>
     </section>
-    
-    <!-- Block 2: Seamos mejores maestros (15 min) -->
+
+    <!-- Bloque 2: Seamos mejores maestros (15 min) -->
     <section id="block-2">
       <h2>Seamos mejores maestros</h2>
+      
       <!-- Participación 1 -->
       <div class="section" data-block-index="2" data-section-index="0" data-allocated="240">
         <div class="section-header">
@@ -193,13 +206,16 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-2-0">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Consejo para Participación 1 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="1" data-allocated="90">
         <div class="section-header">
@@ -209,13 +225,16 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-1">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-2-1">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Participación 2 -->
       <div class="section" data-block-index="2" data-section-index="2" data-allocated="240">
         <div class="section-header">
@@ -229,13 +248,16 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-2">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-2-2">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Consejo para Participación 2 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="3" data-allocated="90">
         <div class="section-header">
@@ -245,13 +267,16 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-3">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-2-3">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Participación 3 -->
       <div class="section" data-block-index="2" data-section-index="4" data-allocated="300">
         <div class="section-header">
@@ -265,13 +290,16 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-4">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-2-4">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Consejo para Participación 3 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="5" data-allocated="90">
         <div class="section-header">
@@ -281,31 +309,7 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-2-5">00:00 (<span class="time-diff">00:00</span>)</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Block 2a: Canción (3 min = 180 seg) -->
-    <section id="block-2a">
-      <h2>Canción (3 min)</h2>
-      <div class="block-time-info">
-      <div class="section no-times" data-block-index="2a" data-section-index="0" data-allocated="180">
-        <div class="section-header">
-          <input type="text" class="section-title" placeholder="Canción">
-          <label>Tiempo: 180 seg</label>
-          <label>Responsable:</label>
-          <input type="text" class="responsible-input" placeholder="Nombre">
-          <label>Inicio:</label>
-          <input type="text" class="start-time" readonly>
-          <label>Fin:</label>
-          <input type="text" class="end-time" readonly>
-        </div>
-        <div class="timer-display" id="timer-block-2a-0">
+        <div class="timer-display" id="timer-block-2-5">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
         <div class="section-controls">
@@ -315,11 +319,38 @@
         </div>
       </div>
     </section>
-    
-    <!-- Block 3: Nuestra vida Cristiana (15 min) -->
+
+    <!-- Bloque 2a: Canción (3 min = 180 seg) -->
+    <section id="block-2a">
+      <h2>Canción (3 min)</h2>
+      <div class="block-time-info">
+        <div class="section no-times" data-block-index="2a" data-section-index="0" data-allocated="180">
+          <div class="section-header">
+            <input type="text" class="section-title" placeholder="Canción">
+            <label>Tiempo: 180 seg</label>
+            <label>Responsable:</label>
+            <input type="text" class="responsible-input" placeholder="Nombre">
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
+          <div class="timer-display" id="timer-block-2a-0">
+            00:00 (<span class="time-diff">00:00</span>)
+          </div>
+          <div class="section-controls">
+            <button class="start-btn">Iniciar</button>
+            <button class="pause-btn">Pausar</button>
+            <button class="reset-btn">Finalizar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bloque 3: Nuestra vida Cristiana (15 min) -->
     <section id="block-3">
       <h2>Nuestra vida Cristiana (15 min)</h2>
-     
+      
       <!-- Sección 0: Primera parte (15 min = 900 seg) -->
       <div class="section" data-block-index="3" data-section-index="0" data-allocated="900">
         <div class="section-header">
@@ -342,6 +373,7 @@
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Sección 1: Segunda parte (con "0" asignado) -->
       <div class="section" data-block-index="3" data-section-index="1" data-allocated="0">
         <div class="section-header">
@@ -364,6 +396,7 @@
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      
       <!-- Sección 2: Estudio Bíblico de congregación (30 min = 1800 seg) -->
       <h2>Estudio bíblico de congregación (30 min)</h2>
       <div class="section" data-block-index="3" data-section-index="2" data-allocated="1800">
@@ -388,67 +421,121 @@
         </div>
       </div>
     </section>
-    
-    <!-- Block 4: Resumen y Anuncios (3 min) -->
+
+    <!-- Bloque 4: Resumen y Anuncios (3 min) -->
     <section id="block-4">
       <h2>Resumen y Anuncios (3 min)</h2>
       <div class="block-time-info">
-       
-      <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
-        <div class="section-header">
-          <input type="text" class="section-title" placeholder="Resumen y Anuncios">
-          <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="180">
-          <label>Inicio:</label>
-          <input type="text" class="start-time" readonly>
-          <label>Fin:</label>
-          <input type="text" class="end-time" readonly>
-        </div>
-        <div class="timer-display" id="timer-block-4-0">
-          00:00 (<span class="time-diff">00:00</span>)
-        </div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+        <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
+          <div class="section-header">
+            <input type="text" class="section-title" placeholder="Resumen y Anuncios">
+            <label>Tiempo (seg):</label>
+            <input type="number" class="allocated-input" value="180">
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
+          <div class="timer-display" id="timer-block-4-0">
+            00:00 (<span class="time-diff">00:00</span>)
+          </div>
+          <div class="section-controls">
+            <button class="start-btn">Iniciar</button>
+            <button class="pause-btn">Pausar</button>
+            <button class="reset-btn">Finalizar</button>
+          </div>
         </div>
       </div>
     </section>
-    
-    <!-- Block 5: Conclusión (5 min) -->
+
+    <!-- Bloque 5: Conclusión (5 min) -->
     <section id="block-5">
       <h2>Conclusión (5 min)</h2>
       <div class="block-time-info">
-      
-      <div class="section" data-block-index="5" data-section-index="0" data-allocated="300">
-        <div class="section-header">
-          <input type="text" class="section-title" placeholder="Canción y Oración a cargo de:">
-          <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="300">
-          <label>Inicio:</label>
-          <input type="text" class="start-time" readonly>
-          <label>Fin:</label>
-          <input type="text" class="end-time" readonly>
-        </div>
-        <div class="timer-display" id="timer-block-5-0">
-          00:00 (<span class="time-diff">00:00</span>)
-        </div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+        <div class="section" data-block-index="5" data-section-index="0" data-allocated="300">
+          <div class="section-header">
+            <input type="text" class="section-title" placeholder="Canción y Oración a cargo de:">
+            <label>Tiempo (seg):</label>
+            <input type="number" class="allocated-input" value="300">
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
+          <div class="timer-display" id="timer-block-5-0">
+            00:00 (<span class="time-diff">00:00</span>)
+          </div>
+          <div class="section-controls">
+            <button class="start-btn">Iniciar</button>
+            <button class="pause-btn">Pausar</button>
+            <button class="reset-btn">Finalizar</button>
+          </div>
         </div>
       </div>
     </section>
-    
-    <!-- Botón para generar el reporte PDF -->
+
+    <!-- Bloque: Botón para generar el reporte PDF -->
     <div class="report">
       <button id="generate-pdf">Generar Reporte en PDF</button>
     </div>
   </div>
-  
-  <!-- Reloj flotante -->
+
+  <!-- Bloque: Reloj flotante (opcional) -->
   <div id="floating-clock"></div>
+  
+  <!-- Script para PDF y manejo de comentarios -->
+  <script>
+    // Generar PDF con los comentarios registrados
+    document.getElementById('generate-pdf').addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let yPosition = 10;
+      
+      // Título del reporte
+      doc.setFontSize(16);
+      doc.text("Reporte de Comentarios", 10, yPosition);
+      yPosition += 10;
+      
+      // Obtener comentarios de la lista
+      const commentListItems = document.querySelectorAll('.comment-list li');
+      if(commentListItems.length === 0) {
+        doc.setFontSize(12);
+        doc.text("No hay comentarios registrados.", 10, yPosition);
+      } else {
+        commentListItems.forEach((item, index) => {
+          doc.setFontSize(12);
+          doc.text((index + 1) + ". " + item.textContent, 10, yPosition);
+          yPosition += 10;
+          // Agregar una nueva página si es necesario
+          if(yPosition > 280) {
+            doc.addPage();
+            yPosition = 10;
+          }
+        });
+      }
+      
+      doc.save("reporte_comentarios.pdf");
+    });
+
+    // Agregar comentarios a la lista al finalizar cada comentario
+    document.querySelectorAll('.comment-end').forEach(button => {
+      button.addEventListener('click', function() {
+        const container = this.closest('.comment-container');
+        const input = container.querySelector('.comment-name');
+        const commentText = input.value.trim();
+        if(commentText !== "") {
+          const li = document.createElement('li');
+          li.textContent = commentText;
+          container.querySelector('.comment-list').appendChild(li);
+          // Actualizar contador
+          const countElem = container.querySelector('.comment-count');
+          countElem.textContent = container.querySelectorAll('.comment-list li').length;
+          // Limpiar el campo
+          input.value = "";
+        }
+      });
+    });
+  </script>
   
   <script src="script.js"></script>
 </body>
