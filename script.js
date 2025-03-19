@@ -221,18 +221,17 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   input.addEventListener('change', updateSectionTimes);
 });
 
-/* GENERACIÓN DEL REPORTE EN PDF CON DIVISIÓN POR COLORES Y NUEVAS ETIQUETAS */
+/* GENERACIÓN DEL REPORTE EN PDF CON AGRUPACIÓN POR BLOQUE Y SIN REPETICIÓN DE NOMBRES */
 document.getElementById('generate-pdf').addEventListener('click', () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   
-  // Variables para el layout
+  // Parámetros de layout
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 12;
-  const colWidth = (pageWidth - 2 * margin) / 3; // 3 columnas para tiempos
-  const rowHeight = 8;
+  const rowHeight = 8; // Altura para cada línea de información
   
-  // Encabezado principal del PDF
+  // Encabezado general del PDF
   doc.setFillColor(180, 0, 100);
   doc.rect(0, 0, pageWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
@@ -246,32 +245,40 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += 10;
   
-  // Paleta de colores para cada bloque <h2>
+  // Paletas de colores para encabezados y líneas de información
   const blockColors = [
-    [255, 204, 204], // Rojo claro
-    [204, 255, 204], // Verde claro
-    [204, 204, 255], // Azul claro
-    [255, 255, 204], // Amarillo claro
-    [204, 255, 255], // Cian claro
-    [255, 204, 255]  // Magenta claro
+    [255, 204, 204],  // rojo claro
+    [204, 255, 204],  // verde claro
+    [204, 204, 255],  // azul claro
+    [255, 255, 204],  // amarillo claro
+    [204, 255, 255],  // cian claro
+    [255, 204, 255]   // magenta claro
   ];
   
-  // Paleta para las secciones internas (participaciones)
-  const participationColors = [
-    [232, 245, 233], // Verde claro
-    [227, 242, 253], // Azul muy claro
-    [255, 224, 178], // Naranja claro
-    [243, 229, 245]  // Lila claro
+  const personColors = [
+    [232, 245, 233],  // verde muy claro
+    [227, 242, 253],  // azul muy claro
+    [255, 224, 178],  // naranja claro
+    [243, 229, 245]   // lila claro
   ];
   
-  let currentTimeForReport = meetingStart ? new Date(meetingStart) : new Date();
-  
-  // Iteramos sobre cada encabezado <h2> dentro de un bloque (<section>)
-  const headers = document.querySelectorAll("section > h2");
-  headers.forEach((h2, blockIndex) => {
-    const blockTitle = h2.textContent;
+  // Recorremos cada bloque de la reunión (secciones con id="block-...")
+  const blocks = document.querySelectorAll("section[id^='block-']");
+  blocks.forEach((block, blockIndex) => {
+    // Buscar en el bloque un encabezado que contenga "Perlas escondidas" (ignora mayúsculas)
+    let blockTitle = "";
+    const headerCandidates = block.querySelectorAll("h2");
+    headerCandidates.forEach(h => {
+      if (h.textContent.toLowerCase().includes("perlas escondidas")) {
+        blockTitle = h.textContent.trim();
+      }
+    });
+    // Si no se encontró, se usa el primer encabezado del bloque
+    if (!blockTitle && headerCandidates.length > 0) {
+      blockTitle = headerCandidates[0].textContent.trim();
+    }
     
-    // Dibujar encabezado del bloque: fondo de color, título grande y centrado
+    // Dibujar el encabezado del bloque
     const blockHeaderHeight = 15;
     let blockColor = blockColors[blockIndex % blockColors.length];
     doc.setFillColor(...blockColor);
@@ -281,85 +288,95 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     doc.text(blockTitle, pageWidth / 2, y + blockHeaderHeight - 4, { align: "center" });
     y += blockHeaderHeight + 4;
     
-    // Procesar cada sección interna del bloque
-    const sections = h2.parentElement.querySelectorAll(".section");
-    sections.forEach((sec, secIndex) => {
-      // Color cíclico para la sección interna 
-      let bgColor = participationColors[secIndex % participationColors.length];
-      doc.setFillColor(...bgColor);
-      
-      // Obtener "Título" y "Asignado"
-      let titleElem = sec.querySelector(".section-title");
-      let title = titleElem ? (titleElem.value || titleElem.textContent) : `Sección ${secIndex + 1}`;
-      let respElem = sec.querySelector(".responsible-input");
-      let assigned = respElem ? respElem.value || "N/A" : "N/A";
-      doc.setFontSize(12);
-      doc.text(`Título: ${title}`, margin, y);
-      y += 6;
-      doc.text(`Asignado: ${assigned}`, margin, y);
-      y += 6;
-      
-      // Fila de tiempos en 3 columnas
-      let allocated = sec.getAllocatedTime ? sec.getAllocatedTime() : 0;
-      let elapsed = sec.getElapsedTime ? sec.getElapsedTime() : 0;
-      const diff = elapsed - allocated;
-      const sign = diff < 0 ? "-" : (diff > 0 ? "+" : "");
-      doc.setFontSize(10);
-      
-      // Columna "Asignado"
-      doc.setFillColor(200, 230, 201);
-      doc.rect(margin, y, colWidth, rowHeight, 'F');
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Asignado: ${formatTime(allocated)}`, margin + 2, y + 6);
-      
-      // Columna "Real"
-      doc.setFillColor(187, 222, 251);
-      doc.rect(margin + colWidth, y, colWidth, rowHeight, 'F');
-      doc.text(`Real: ${formatTime(elapsed)}`, margin + colWidth + 2, y + 6);
-      
-      // Columna "Dif"
-      doc.setFillColor(255, 224, 178);
-      doc.rect(margin + 2 * colWidth, y, colWidth, rowHeight, 'F');
-      doc.text(`Dif: ${sign}${formatTime(Math.abs(diff))}`, margin + 2 * colWidth + 2, y + 6);
-      y += rowHeight + 4;
-      
-      // Imprimir horario (si aplica)
-      if (!sec.classList.contains("no-times")) {
-        let sectionStartTime = new Date(currentTimeForReport);
-        let sectionEndTime = new Date(currentTimeForReport.getTime() + allocated * 1000);
-        doc.setFontSize(10);
-        doc.text(`Horario: ${formatDateTime(sectionStartTime)} - ${formatDateTime(sectionEndTime)}`, margin, y);
-        currentTimeForReport = sectionEndTime;
-        y += 6;
-      }
-      
-      // Imprimir comentarios (si existen)
-      if (sec.commentsData && sec.commentsData.length > 0) {
-        doc.setFontSize(10);
-        doc.text("Comentarios:", margin + 2, y);
-        y += 5;
-        sec.commentsData.forEach(comment => {
-          let commentText = `- ${comment.name}: ${formatTime(comment.duration)}`;
-          if (comment.exceeded) {
-            let diffComment = comment.duration - 30;
-            commentText += ` (Dif: +${formatTime(diffComment)})`;
-            doc.setTextColor(255, 0, 0);
+    // Recolectar las secciones hijas de este bloque
+    const sections = block.querySelectorAll(".section");
+    // Inicializar grupos para cada tipo de sección
+    let commentGroup = {};     // Comentarios: {nombre: tiempo_total}
+    let responsibleGroup = {}; // Secciones normales (asignados)
+    let consejos = [];         // Array de secciones consejo
+    
+    sections.forEach(sec => {
+      // Si la sección tiene un contenedor de comentarios...
+      if (sec.querySelector(".comment-container")) {
+        const commentContainer = sec.querySelector(".comment-container");
+        // Se asume que los comentarios se agregan a un <ul class="comment-list"> como <li>
+        const commentItems = commentContainer.querySelectorAll(".comment-list li");
+        commentItems.forEach(item => {
+          // Intentar extraer atributos data-name y data-duration (en segundos)
+          let name = item.getAttribute("data-name");
+          let duration = item.getAttribute("data-duration");
+          if (!name) {
+            // Si no existen, se usa el contenido del li y se asignan 30 seg por comentario
+            name = item.textContent.trim();
+            duration = 30;
           } else {
-            doc.setTextColor(33, 33, 33);
+            name = name.trim();
+            duration = duration ? parseInt(duration, 10) : 30;
           }
-          doc.text(commentText, margin + 4, y);
-          y += 5;
+          commentGroup[name] = (commentGroup[name] || 0) + duration;
         });
-        doc.setTextColor(33, 33, 33);
-        y += 3;
       }
-      
-      // Si se alcanza el final de la página, se agrega una nueva
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
+      // Si la sección tiene la clase "consejo", se procesa por separado
+      else if (sec.classList.contains("consejo")) {
+        consejos.push(sec);
+      }
+      // Caso "normal": se espera un input con clase "responsible-input"
+      else {
+        let input = sec.querySelector(".responsible-input");
+        let name = input ? input.value.trim() : "N/A";
+        let elapsed = sec.getElapsedTime ? sec.getElapsedTime() : 0;
+        responsibleGroup[name] = (responsibleGroup[name] || 0) + elapsed;
       }
     });
+    
+    // Primero se muestran los asignados (responsable)
+    if (Object.keys(responsibleGroup).length > 0) {
+      let idx = 0;
+      Object.entries(responsibleGroup).forEach(([name, totalTime]) => {
+        let color = personColors[idx % personColors.length];
+        doc.setFillColor(...color);
+        doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.text(`Asignado: ${name}   Tiempo usado: ${formatTime(totalTime)}`, margin + 2, y + 6);
+        y += rowHeight + 2;
+        idx++;
+        if (y > 270) { doc.addPage(); y = 20; }
+      });
+    }
+    
+    // Luego se muestran los comentarios
+    if (Object.keys(commentGroup).length > 0) {
+      doc.setFontSize(12);
+      let idx = 0;
+      for (let [name, totalTime] of Object.entries(commentGroup)) {
+        let color = personColors[idx % personColors.length];
+        doc.setFillColor(...color);
+        doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${name}   Tiempo usado: ${formatTime(totalTime)}`, margin + 2, y + 6);
+        y += rowHeight + 2;
+        idx++;
+        if (y > 270) { doc.addPage(); y = 20; }
+      }
+    }
+    
+    // Por último, se muestran las secciones de consejo (si las hubiera)
+    if (consejos.length > 0) {
+      consejos.forEach((sec, idx) => {
+         let elapsed = sec.getElapsedTime ? sec.getElapsedTime() : 0;
+         let label = `Consejo ${idx+1} del presidente`;
+         let color = personColors[idx % personColors.length];
+         doc.setFillColor(...color);
+         doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
+         doc.setTextColor(0, 0, 0);
+         doc.setFontSize(12);
+         doc.text(`${label}   Tiempo usado: ${formatTime(elapsed)}`, margin + 2, y + 6);
+         y += rowHeight + 2;
+         if (y > 270) { doc.addPage(); y = 20; }
+      });
+    }
+    
     y += 8; // Espacio entre bloques
   });
   
@@ -369,7 +386,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   disableAllSectionControls();
 });
 
-/* ACTUALIZA LOS NOMBRES EN .council-responsible (si existen) */
+/* ACTUALIZA LOS NOMBRES EN ELEMENTOS .council-responsible (si existen) */
 document.getElementById("president-name").addEventListener("input", function() {
   let presidentName = this.value || "No especificado";
   document.querySelectorAll(".council-responsible").forEach(el => {
@@ -377,10 +394,38 @@ document.getElementById("president-name").addEventListener("input", function() {
   });
 });
 
+// Función de formateo de tiempo (por ejemplo, "m:ss")
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Función para convertir un string de tiempo "m:ss" o "s" a segundos
+function parseTime(timeStr) {
+  const parts = timeStr.split(":");
+  if (parts.length === 2) {
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  }
+  return parseInt(timeStr, 10) || 0;
+}
+
+// Función para deshabilitar los controles de sección al generar el reporte
+function disableAllSectionControls() {
+  document.querySelectorAll('.section-controls button').forEach(button => {
+    button.disabled = true;
+  });
+}
+
 // Inicia la aplicación al cargar el DOM
 window.addEventListener('DOMContentLoaded', initializeApp);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
     .then(() => console.log("Service Worker registrado"))
     .catch(err => console.log("Error en Service Worker:", err));
+}
+
+// Función de inicialización de la aplicación (puedes agregar más lógica aquí)
+function initializeApp() {
+  console.log("Aplicación iniciada");
 }
