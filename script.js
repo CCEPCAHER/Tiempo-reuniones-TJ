@@ -94,6 +94,37 @@ document.querySelectorAll('.section').forEach(section => {
   
   updateDisplay();
 });
+// Función auxiliar para buscar recursivamente secciones dentro de un contenedor
+function collectSections(element) {
+  let sections = [];
+  if (element.classList && element.classList.contains("section")) {
+    sections.push(element);
+  }
+  // Buscar secciones en los hijos
+  element.querySelectorAll(".section").forEach(sec => {
+    sections.push(sec);
+  });
+  return sections;
+}
+
+// Agrupar todas las secciones según el h2 que las precede (buscando recursivamente)
+const allSectionGroups = [];
+document.querySelectorAll("h2").forEach(h2 => {
+  const group = { title: h2.textContent.trim(), sections: [] };
+  let sibling = h2.nextElementSibling;
+  while (sibling && sibling.tagName !== "H2") {
+    // Si el elemento tiene la clase "section", se agrega directamente...
+    if (sibling.classList && sibling.classList.contains("section")) {
+      group.sections.push(sibling);
+    } else {
+      // Si no, se buscan dentro de este elemento todas las secciones
+      const innerSections = collectSections(sibling);
+      innerSections.forEach(sec => group.sections.push(sec));
+    }
+    sibling = sibling.nextElementSibling;
+  }
+  allSectionGroups.push(group);
+});
 
 /* FUNCIONALIDAD PARA COMENTARIOS EN SECCIONES with-comments */
 document.querySelectorAll('.with-comments').forEach(section => {
@@ -231,23 +262,34 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   let y = 20;
   const rowHeight = 8;
 
-  // Encabezado general del PDF con fondo degradado (simulado con un bloque grande)
-  doc.setFillColor(63, 81, 181); // Azul índigo
-  doc.rect(0, 0, pageWidth, 20, 'F');
+  // Encabezado general del PDF
+  doc.setFillColor(180, 0, 100);
+  doc.rect(0, 0, pageWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
-  doc.text("Reporte Final de la Reunión", pageWidth / 2, 14, { align: "center" });
+  doc.text("Reporte Final de la Reunión", pageWidth / 2, 12, { align: "center" });
 
   y = 30;
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "normal");
   const presidentName = document.getElementById("president-name").value || "N/A";
+  doc.setFontSize(14);
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += 10;
 
-  // Agrupar todas las secciones según el h2 que las precede
+  // Función auxiliar para buscar recursivamente secciones dentro de un contenedor
+  function collectSections(element) {
+    let sections = [];
+    if (element.classList && element.classList.contains("section")) {
+      sections.push(element);
+    }
+    element.querySelectorAll(".section").forEach(sec => {
+      sections.push(sec);
+    });
+    return sections;
+  }
+
+  // Agrupar todas las secciones según el h2 que las precede (buscando recursivamente)
   const allSectionGroups = [];
   document.querySelectorAll("h2").forEach(h2 => {
     const group = { title: h2.textContent.trim(), sections: [] };
@@ -255,20 +297,23 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     while (sibling && sibling.tagName !== "H2") {
       if (sibling.classList && sibling.classList.contains("section")) {
         group.sections.push(sibling);
+      } else {
+        const innerSections = collectSections(sibling);
+        innerSections.forEach(sec => group.sections.push(sec));
       }
       sibling = sibling.nextElementSibling;
     }
     allSectionGroups.push(group);
   });
 
-  // Paleta de colores pastel para los encabezados de bloque
+  // Paleta de colores pastel para encabezados de grupo
   const blockColors = [
-    [255, 230, 230],  // rosa muy suave
-    [230, 255, 230],  // verde muy suave
-    [230, 230, 255],  // azul muy suave
-    [255, 255, 230],  // amarillo suave
-    [230, 255, 255],  // cian muy suave
-    [255, 230, 255]   // lila muy suave
+    [255, 230, 230],
+    [230, 255, 230],
+    [230, 230, 255],
+    [255, 255, 230],
+    [230, 255, 255],
+    [255, 230, 255]
   ];
 
   // Función auxiliar: extraer el tiempo utilizado (se asume formato "mm:ss")
@@ -291,7 +336,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  // Función auxiliar para convertir "mm:ss" a segundos
+  // Función auxiliar para convertir un string "mm:ss" a segundos
   function parseTime(timeStr) {
     const parts = timeStr.split(":");
     if (parts.length === 2) {
@@ -303,7 +348,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   // Procesar cada grupo (cada h2 y sus secciones)
   allSectionGroups.forEach((group, groupIndex) => {
     if (y > 270) { doc.addPage(); y = 20; }
-    // Título de grupo con fuente grande, en negro y centrado
+    // Título de grupo: fuente grande, centrado y en negro
     const color = blockColors[groupIndex % blockColors.length];
     doc.setFillColor(...color);
     doc.rect(margin, y, pageWidth - 2 * margin, 14, 'F');
@@ -313,19 +358,18 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     doc.text(group.title, pageWidth / 2, y + 10, { align: "center" });
     y += 18;
 
-    // Restauramos fuente normal para el contenido
+    // Restaurar fuente normal para el contenido
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
 
     group.sections.forEach((sec, secIndex) => {
-      // Caso 1: Bloques de "Canción" o "Oración" (sin participantes)
+      // Caso 1: Bloques de "Canción" o "Oración"
       if (group.title.toLowerCase().includes("canción") || group.title.toLowerCase().includes("oración")) {
         const allocated = sec.getAttribute("data-allocated") || "0";
         const assigned = formatTime(parseInt(allocated, 10));
         doc.text(`Tiempo asignado: ${assigned}`, margin + 5, y);
         y += 8;
         const elapsed = getElapsedTimeForSection(sec);
-        // Determinar color según tiempo: verde si en tiempo, rojo si se excede
         const elapsedSec = parseTime(elapsed);
         const allocatedSec = parseInt(allocated, 10);
         const timeColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
@@ -334,53 +378,58 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         doc.setTextColor(0, 0, 0);
         y += 10;
       }
-      // Caso 2: Sección de Consejo (clase "consejo")
+      // Caso 2: Sección de Consejo (con clase "consejo")
       else if (sec.classList.contains("consejo")) {
-        // Imprimir el encabezado con el nombre del presidente
-        doc.setTextColor("#388e3c"); // Por defecto verde; si se excede, luego se cambia
-        doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
-        y += 8;
-        let allocated = sec.getAttribute("data-allocated") || "0";
+        doc.setFontSize(12);
+        // Imprimir "Consejo a cargo de [nombre del presidente]"
+        const allocated = sec.getAttribute("data-allocated") || "0";
         const allocatedSec = parseInt(allocated, 10);
-        if (allocated) {
-          allocated = formatTime(allocatedSec);
-          doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
-          y += 8;
-        }
         const elapsed = getElapsedTimeForSection(sec);
         const elapsedSec = parseTime(elapsed);
         const nameColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
         doc.setTextColor(nameColor);
-        doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
+        doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
         doc.setTextColor(0, 0, 0);
+        y += 8;
+        if (allocated) {
+          const assigned = formatTime(allocatedSec);
+          doc.text(`Tiempo asignado: ${assigned}`, margin + 5, y);
+          y += 8;
+        }
+        doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
         y += 10;
       }
       // Caso 3: Secciones normales
       else {
-        // Imprimir campos del encabezado (título, responsable, etc.)
-        const fields = sec.querySelectorAll('.section-header input:not(.allocated-input)');
-        fields.forEach(field => {
-          let label = field.previousElementSibling ? field.previousElementSibling.textContent.trim() : "Título";
-          let value = field.value;
-          // Para "Palabras de introducción" o "Resumen y Anuncios" se usa el nombre del presidente si está vacío
-          if (!value && (sec.parentElement.id === "block-0b" || sec.parentElement.id === "block-4")) {
-            value = presidentName;
-          }
-          // Si es el campo de responsable, cambiar color según tiempo utilizado
-          if (field.classList.contains("responsible-input")) {
-            const allocated = sec.getAttribute("data-allocated") || "0";
-            const allocatedSec = parseInt(allocated, 10);
-            const elapsed = getElapsedTimeForSection(sec);
-            const elapsedSec = parseTime(elapsed);
-            const respColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
-            doc.setTextColor(respColor);
-            doc.text(`${label}: ${value}`, margin + 5, y);
-            doc.setTextColor(0, 0, 0);
-          } else {
-            doc.text(`${label}: ${value}`, margin + 5, y);
-          }
+        // Se buscan todos los elementos con la clase "section-title" (input o span)
+        const titleElements = sec.querySelectorAll('.section-header .section-title');
+        if (titleElements.length > 0) {
+          titleElements.forEach(el => {
+            let label = el.previousElementSibling ? el.previousElementSibling.textContent.trim() : "Título";
+            let value = (el.tagName.toLowerCase() === "input") ? el.value : el.textContent;
+            if (!value && (sec.parentElement.id === "block-0b" || sec.parentElement.id === "block-4")) {
+              value = presidentName;
+            }
+            // Si es el campo de responsable, se aplica color según el tiempo utilizado
+            if (el.classList.contains("responsible-input")) {
+              const allocated = sec.getAttribute("data-allocated") || "0";
+              const allocatedSec = parseInt(allocated, 10);
+              const elapsed = getElapsedTimeForSection(sec);
+              const elapsedSec = parseTime(elapsed);
+              const respColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
+              doc.setTextColor(respColor);
+              doc.text(`${label}: ${value}`, margin + 5, y);
+              doc.setTextColor(0, 0, 0);
+            } else {
+              doc.text(`${label}: ${value}`, margin + 5, y);
+            }
+            y += 8;
+          });
+        } else {
+          // Valor por defecto si no se encuentra título
+          doc.text("Título: Sin título", margin + 5, y);
           y += 8;
-        });
+        }
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
@@ -390,7 +439,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         const elapsed = getElapsedTimeForSection(sec);
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
         y += 8;
-        // Recorrer comentarios (todos los <li> del contenedor de comentarios)
+        // Recorrer comentarios (todos los <li> dentro del contenedor de comentarios)
         const commentList = sec.querySelector('.comment-container .comment-list');
         if (commentList && commentList.children.length > 0) {
           doc.setFont(undefined, 'bold');
