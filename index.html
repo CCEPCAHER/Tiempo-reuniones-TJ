@@ -31,13 +31,13 @@
       </div>
     </div>
     
-    <!-- Block 0: Introducción (5 min = 300 seg) -->
-    <section id="block-0">
-      <h2>canción y oración (5 min)</h2>
-      <div class="section" data-block-index="0" data-section-index="0">
+    <!-- Block 0a: Introducción – Canción y oración (5 min = 300 seg) -->
+    <section id="block-0a">
+      <h2>Canción y oración (5 min)</h2>
+      
+      <div class="section" data-block-index="0a" data-section-index="0" data-allocated="300">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Canción y Oración">
-        
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="300">
           <label>Inicio:</label>
@@ -45,18 +45,22 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-0-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-0a-0">00:00 (<span class="time-diff">00:00</span>)</div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
-<section id="block-0">
+    </section>
+    
+    <!-- Block 0b: Introducción – Palabras de introducción (1 min) -->
+    <section id="block-0b">
       <h2>Palabras de introducción (1 min)</h2>
-      <div class="section" data-block-index="0" data-section-index="0">
+      
+      <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
         <div class="section-header">
-          <input type="text" class="section-title" placeholder=" Presidente">
+          <input type="text" class="section-title" placeholder="Palabras de introducción">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="60">
           <label>Inicio:</label>
@@ -64,7 +68,7 @@
           <label>Fin:</label>
           <input type="text" class="end-time" readonly>
         </div>
-        <div class="timer-display" id="timer-block-0-0">00:00 (<span class="time-diff">00:00</span>)</div>
+        <div class="timer-display" id="timer-block-0b-0">00:00 (<span class="time-diff">00:00</span>)</div>
         <div class="section-controls">
           <button class="start-btn">Iniciar</button>
           <button class="pause-btn">Pausar</button>
@@ -76,11 +80,11 @@
     <!-- Block 1: Tesoros de la Biblia (10 min) -->
     <section id="block-1">
       <h2>Tesoros de la Biblia (10 min)</h2>
+     
       <!-- Sección 1: Orador (tiempo fijo: 600 seg) -->
       <div class="section" data-block-index="1" data-section-index="0" data-allocated="600">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Título del discurso">
-          <!-- Se elimina el input editable y se usa el valor fijo -->
           <span class="allocated-fixed">600 seg</span>
           <label>Dirige la asignación:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
@@ -101,10 +105,10 @@
       <h2>Perlas escondidas (10 min)</h2>
       <div class="section with-comments" data-block-index="1" data-section-index="1" data-allocated="600">
         <div class="section-header">
-          <input type="text" class="section-title" placeholder="Libro y capitulos a analizar:" >
+          <input type="text" class="section-title" placeholder="Libro y capítulos a analizar:">
           <span class="allocated-fixed">600 seg</span>
           <label>Responsable:</label>
-          <input type="text" class="responsible-input" placeholder="Nombre?">
+          <input type="text" class="responsible-input" placeholder="Nombre">
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -173,7 +177,7 @@
       </div>
     </section>
     
-    <!-- Block 2: Seamos mejores maestros -->
+    <!-- Block 2: Seamos mejores maestros (15 min) -->
     <section id="block-2">
       <h2>Seamos mejores maestros</h2>
       <!-- Participación 1 -->
@@ -287,9 +291,9 @@
     </section>
     
     <!-- Block 2a: Canción (3 min = 180 seg) -->
-    <!-- En este bloque se muestra el tiempo, pues se requiere visualización -->
     <section id="block-2a">
       <h2>Canción (3 min)</h2>
+      <div class="block-time-info">
       <div class="section no-times" data-block-index="2a" data-section-index="0" data-allocated="180">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Canción">
@@ -315,7 +319,8 @@
     <!-- Block 3: Nuestra vida Cristiana (15 min) -->
     <section id="block-3">
       <h2>Nuestra vida Cristiana (15 min)</h2>
-      <!-- Sección 1: Primera parte (15 min) -->
+     
+      <!-- Sección 0: Primera parte (15 min = 900 seg) -->
       <div class="section" data-block-index="3" data-section-index="0" data-allocated="900">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Título primera parte">
@@ -337,37 +342,12 @@
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
-
-      <!-- Sección 2: Estudio bíblico de la congregación (30 min) 
--->
- <div class="section" data-block-index="3" data-section-index="0" data-allocated="000">
+      <!-- Sección 1: Segunda parte (con "0" asignado) -->
+      <div class="section" data-block-index="3" data-section-index="1" data-allocated="0">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Título segunda parte">
           <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="000">
-          <label>Responsable:</label>
-          <input type="text" class="responsible-input" placeholder="Nombre">
-          <label>Inicio:</label>
-          <input type="text" class="start-time" readonly>
-          <label>Fin:</label>
-          <input type="text" class="end-time" readonly>
-        </div>
-        <div class="timer-display" id="timer-block-3-0">
-          00:00 (<span class="time-diff">00:00</span>)
-        </div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
- <h2>estudio bíblico de congregación (30 min)</h2>
-
-      <div class="section" data-block-index="3" data-section-index="1" data-allocated="1800">
-        <div class="section-header">
-          <input type="text" class="section-title" placeholder="Libro y lección">
-          <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="1800">
+          <input type="number" class="allocated-input" value="0">
           <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
           <label>Inicio:</label>
@@ -384,14 +364,39 @@
           <button class="reset-btn">Finalizar</button>
         </div>
       </div>
+      <!-- Sección 2: Estudio Bíblico de congregación (30 min = 1800 seg) -->
+      <h2>Estudio bíblico de congregación (30 min)</h2>
+      <div class="section" data-block-index="3" data-section-index="2" data-allocated="1800">
+        <div class="section-header">
+          <input type="text" class="section-title" placeholder="Libro y lección">
+          <label>Tiempo (seg):</label>
+          <input type="number" class="allocated-input" value="1800">
+          <label>Responsable:</label>
+          <input type="text" class="responsible-input" placeholder="Nombre">
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
+        <div class="timer-display" id="timer-block-3-2">
+          00:00 (<span class="time-diff">00:00</span>)
+        </div>
+        <div class="section-controls">
+          <button class="start-btn">Iniciar</button>
+          <button class="pause-btn">Pausar</button>
+          <button class="reset-btn">Finalizar</button>
+        </div>
+      </div>
     </section>
     
-    <!-- Block 4: Resumen y palabras finales (3 min) -->
+    <!-- Block 4: Resumen y Anuncios (3 min) -->
     <section id="block-4">
-      <h2>Resumen y palabras finales (3 min)</h2>
+      <h2>Resumen y Anuncios (3 min)</h2>
+      <div class="block-time-info">
+       
       <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
         <div class="section-header">
-          <input type="text" class="section-title" placeholder="Presidente">
+          <input type="text" class="section-title" placeholder="Resumen y Anuncios">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="180">
           <label>Inicio:</label>
@@ -413,6 +418,8 @@
     <!-- Block 5: Conclusión (5 min) -->
     <section id="block-5">
       <h2>Conclusión (5 min)</h2>
+      <div class="block-time-info">
+      
       <div class="section" data-block-index="5" data-section-index="0" data-allocated="300">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Canción y Oración a cargo de:">
@@ -445,4 +452,4 @@
   
   <script src="script.js"></script>
 </body>
-</html> 
+</html>
