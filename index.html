@@ -37,9 +37,9 @@
       <h2>Canción y oración (5 min)</h2>
       <div class="section" data-block-index="0a" data-section-index="0" data-allocated="300">
         <div class="section-header">
-          <input type="text" class="section-title" placeholder="Canción y Oración">
-          <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="300">
+          <!-- Se muestra texto estático en lugar de input -->
+          <span class="section-title">Canción y Oración</span>
+          <span>Tiempo asignado: 300 seg</span>
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -61,7 +61,9 @@
       <h2>Palabras de introducción (1 min)</h2>
       <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
         <div class="section-header">
+          <!-- Se mantiene el input para el título; se añade span para responsable que se actualizará con el nombre del presidente -->
           <input type="text" class="section-title" placeholder="Palabras de introducción">
+          <span class="council-responsible"></span>
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="60">
           <label>Inicio:</label>
@@ -132,7 +134,6 @@
           <h4>Comentarios del Auditorio (30 seg cada uno)</h4>
           <div class="comment-input">
             <label>Nombre:</label>
-            <!-- Corregido: se usa "comment-name" sin el punto -->
             <input type="text" class="comment-name" placeholder="Nombre del comentador">
           </div>
           <div class="timer-display comment-timer">00:00</div>
@@ -172,7 +173,8 @@
       <!-- Sección 4: Consejo (90 seg fijos, sin input) -->
       <div class="section consejo" data-block-index="1" data-section-index="3" data-allocated="90">
         <div class="section-header">
-          <label class="section-title" style="font-weight:bold;">Consejo (90 seg):</label>
+          <label class="section-title" style="font-weight:bold;">Consejo (90 seg)</label>
+          <!-- Aquí no hay input para título, pero sí se muestran hora de inicio y fin -->
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -219,7 +221,7 @@
       <!-- Consejo para Participación 1 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="1" data-allocated="90">
         <div class="section-header">
-          <label class="section-title" style="font-weight:bold;">Consejo (90 seg):</label>
+          <label class="section-title" style="font-weight:bold;">Consejo (90 seg)</label>
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -261,7 +263,7 @@
       <!-- Consejo para Participación 2 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="3" data-allocated="90">
         <div class="section-header">
-          <label class="section-title" style="font-weight:bold;">Consejo (90 seg):</label>
+          <label class="section-title" style="font-weight:bold;">Consejo (90 seg)</label>
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -303,7 +305,7 @@
       <!-- Consejo para Participación 3 (90 seg, sin input) -->
       <div class="section consejo" data-block-index="2" data-section-index="5" data-allocated="90">
         <div class="section-header">
-          <label class="section-title" style="font-weight:bold;">Consejo (90 seg):</label>
+          <label class="section-title" style="font-weight:bold;">Consejo (90 seg)</label>
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
           <label>Fin:</label>
@@ -320,16 +322,15 @@
       </div>
     </section>
 
-    <!-- Bloque 2a: Canción (3 min = 180 seg) -->
+    <!-- Bloque 2a: Canción (3 min) -->
     <section id="block-2a">
       <h2>Canción (3 min)</h2>
       <div class="block-time-info">
         <div class="section no-times" data-block-index="2a" data-section-index="0" data-allocated="180">
           <div class="section-header">
-            <input type="text" class="section-title" placeholder="Canción">
-            <label>Tiempo: 180 seg</label>
-            <label>Responsable:</label>
-            <input type="text" class="responsible-input" placeholder="Nombre">
+            <!-- Se muestra texto estático en lugar de input -->
+            <span class="section-title">Canción</span>
+            <span>Tiempo asignado: 180 seg</span>
             <label>Inicio:</label>
             <input type="text" class="start-time" readonly>
             <label>Fin:</label>
@@ -429,6 +430,8 @@
         <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
           <div class="section-header">
             <input type="text" class="section-title" placeholder="Resumen y Anuncios">
+            <!-- Se añade span para indicar responsable (por defecto, el presidente) -->
+            <span class="council-responsible"></span>
             <label>Tiempo (seg):</label>
             <input type="number" class="allocated-input" value="180">
             <label>Inicio:</label>
@@ -454,9 +457,9 @@
       <div class="block-time-info">
         <div class="section" data-block-index="5" data-section-index="0" data-allocated="300">
           <div class="section-header">
-            <input type="text" class="section-title" placeholder="Canción y Oración a cargo de:">
-            <label>Tiempo (seg):</label>
-            <input type="number" class="allocated-input" value="300">
+            <!-- Se muestra texto estático y se asigna al presidente mediante la clase council-responsible -->
+            <span class="section-title council-responsible">Canción y Oración a cargo de:</span>
+            <span>Tiempo asignado: 300 seg</span>
             <label>Inicio:</label>
             <input type="text" class="start-time" readonly>
             <label>Fin:</label>
@@ -482,60 +485,6 @@
 
   <!-- Bloque: Reloj flotante (opcional) -->
   <div id="floating-clock"></div>
-  
-  <!-- Script para PDF y manejo de comentarios -->
-  <script>
-    // Generar PDF con los comentarios registrados
-    document.getElementById('generate-pdf').addEventListener('click', function() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let yPosition = 10;
-      
-      // Título del reporte
-      doc.setFontSize(16);
-      doc.text("Reporte de Comentarios", 10, yPosition);
-      yPosition += 10;
-      
-      // Obtener comentarios de la lista
-      const commentListItems = document.querySelectorAll('.comment-list li');
-      if(commentListItems.length === 0) {
-        doc.setFontSize(12);
-        doc.text("No hay comentarios registrados.", 10, yPosition);
-      } else {
-        commentListItems.forEach((item, index) => {
-          doc.setFontSize(12);
-          doc.text((index + 1) + ". " + item.textContent, 10, yPosition);
-          yPosition += 10;
-          // Agregar una nueva página si es necesario
-          if(yPosition > 280) {
-            doc.addPage();
-            yPosition = 10;
-          }
-        });
-      }
-      
-      doc.save("reporte_comentarios.pdf");
-    });
-
-    // Agregar comentarios a la lista al finalizar cada comentario
-    document.querySelectorAll('.comment-end').forEach(button => {
-      button.addEventListener('click', function() {
-        const container = this.closest('.comment-container');
-        const input = container.querySelector('.comment-name');
-        const commentText = input.value.trim();
-        if(commentText !== "") {
-          const li = document.createElement('li');
-          li.textContent = commentText;
-          container.querySelector('.comment-list').appendChild(li);
-          // Actualizar contador
-          const countElem = container.querySelector('.comment-count');
-          countElem.textContent = container.querySelectorAll('.comment-list li').length;
-          // Limpiar el campo
-          input.value = "";
-        }
-      });
-    });
-  </script>
   
   <script src="script.js"></script>
 </body>
