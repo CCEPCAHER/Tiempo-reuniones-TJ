@@ -1,11 +1,11 @@
-/* Función para formatear segundos a mm:ss */
+// Función para formatear segundos a mm:ss
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = String(seconds % 60).padStart(2, "0");
   return String(mins).padStart(2, "0") + ":" + secs;
 }
 
-/* Funciones para habilitar/deshabilitar controles */
+// Funciones para habilitar/deshabilitar controles
 function disableAllSectionControls() {
   document.querySelectorAll('.start-btn, .pause-btn, .reset-btn, .comment-start, .comment-end, .next-comment').forEach(btn => {
     btn.disabled = true;
@@ -39,6 +39,7 @@ document.querySelectorAll('.section').forEach(section => {
     const diff = currentTime - allocatedTime;
     const sign = diff < 0 ? "-" : (diff > 0 ? "+" : "");
     timerDisplay.innerHTML = `<span class="time-main">${formatTime(currentTime)}</span> <span class="time-diff">(${sign}${formatTime(Math.abs(diff))})</span>`;
+    // Los cambios de color en el DOM se hacen aquí (verde si no se excede, rojo si se excede)
     if (diff <= 0) {
       timerDisplay.classList.remove('red');
       timerDisplay.classList.add('green');
@@ -221,172 +222,202 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   input.addEventListener('change', updateSectionTimes);
 });
 
-/* GENERACIÓN DEL REPORTE EN PDF CON AGRUPACIÓN POR BLOQUE Y SIN REPETICIÓN DE NOMBRES */
+/* GENERACIÓN DEL REPORTE EN PDF CON AGRUPACIÓN POR BLOQUE Y SIN REPETICIÓN DE DATOS */
 document.getElementById('generate-pdf').addEventListener('click', () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
-  
-  // Parámetros de layout
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 12;
-  const rowHeight = 8; // Altura para cada línea de información
-  
-  // Encabezado general del PDF
-  doc.setFillColor(180, 0, 100);
-  doc.rect(0, 0, pageWidth, 15, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.text("Reporte Final de la Reunión", margin, 10);
-  
   let y = 20;
+  const rowHeight = 8;
+
+  // Encabezado general del PDF con fondo degradado (simulado con un bloque grande)
+  doc.setFillColor(63, 81, 181); // Azul índigo
+  doc.rect(0, 0, pageWidth, 20, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("Reporte Final de la Reunión", pageWidth / 2, 14, { align: "center" });
+
+  y = 30;
   doc.setTextColor(0, 0, 0);
-  const presidentName = document.getElementById("president-name").value || "N/A";
   doc.setFontSize(14);
+  doc.setFont("helvetica", "normal");
+  const presidentName = document.getElementById("president-name").value || "N/A";
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += 10;
-  
-  // Paletas de colores para encabezados y líneas de información
-  const blockColors = [
-    [255, 204, 204],  // rojo claro
-    [204, 255, 204],  // verde claro
-    [204, 204, 255],  // azul claro
-    [255, 255, 204],  // amarillo claro
-    [204, 255, 255],  // cian claro
-    [255, 204, 255]   // magenta claro
-  ];
-  
-  const personColors = [
-    [232, 245, 233],  // verde muy claro
-    [227, 242, 253],  // azul muy claro
-    [255, 224, 178],  // naranja claro
-    [243, 229, 245]   // lila claro
-  ];
-  
-  // Recorremos cada bloque de la reunión (secciones con id="block-...")
-  const blocks = document.querySelectorAll("section[id^='block-']");
-  blocks.forEach((block, blockIndex) => {
-    // Buscar en el bloque un encabezado que contenga "Perlas escondidas" (ignora mayúsculas)
-    let blockTitle = "";
-    const headerCandidates = block.querySelectorAll("h2");
-    headerCandidates.forEach(h => {
-      if (h.textContent.toLowerCase().includes("perlas escondidas")) {
-        blockTitle = h.textContent.trim();
+
+  // Agrupar todas las secciones según el h2 que las precede
+  const allSectionGroups = [];
+  document.querySelectorAll("h2").forEach(h2 => {
+    const group = { title: h2.textContent.trim(), sections: [] };
+    let sibling = h2.nextElementSibling;
+    while (sibling && sibling.tagName !== "H2") {
+      if (sibling.classList && sibling.classList.contains("section")) {
+        group.sections.push(sibling);
       }
-    });
-    // Si no se encontró, se usa el primer encabezado del bloque
-    if (!blockTitle && headerCandidates.length > 0) {
-      blockTitle = headerCandidates[0].textContent.trim();
+      sibling = sibling.nextElementSibling;
     }
-    
-    // Dibujar el encabezado del bloque
-    const blockHeaderHeight = 15;
-    let blockColor = blockColors[blockIndex % blockColors.length];
-    doc.setFillColor(...blockColor);
-    doc.rect(margin, y, pageWidth - 2 * margin, blockHeaderHeight, 'F');
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(20);
-    doc.text(blockTitle, pageWidth / 2, y + blockHeaderHeight - 4, { align: "center" });
-    y += blockHeaderHeight + 4;
-    
-    // Recolectar las secciones hijas de este bloque
-    const sections = block.querySelectorAll(".section");
-    // Inicializar grupos para cada tipo de sección
-    let commentGroup = {};     // Comentarios: {nombre: tiempo_total}
-    let responsibleGroup = {}; // Secciones normales (asignados)
-    let consejos = [];         // Array de secciones consejo
-    
-    sections.forEach(sec => {
-      // Si la sección tiene un contenedor de comentarios...
-      if (sec.querySelector(".comment-container")) {
-        const commentContainer = sec.querySelector(".comment-container");
-        // Se asume que los comentarios se agregan a un <ul class="comment-list"> como <li>
-        const commentItems = commentContainer.querySelectorAll(".comment-list li");
-        commentItems.forEach(item => {
-          // Intentar extraer atributos data-name y data-duration (en segundos)
-          let name = item.getAttribute("data-name");
-          let duration = item.getAttribute("data-duration");
-          if (!name) {
-            // Si no existen, se usa el contenido del li y se asignan 30 seg por comentario
-            name = item.textContent.trim();
-            duration = 30;
-          } else {
-            name = name.trim();
-            duration = duration ? parseInt(duration, 10) : 30;
-          }
-          commentGroup[name] = (commentGroup[name] || 0) + duration;
-        });
-      }
-      // Si la sección tiene la clase "consejo", se procesa por separado
-      else if (sec.classList.contains("consejo")) {
-        consejos.push(sec);
-      }
-      // Caso "normal": se espera un input con clase "responsible-input"
-      else {
-        let input = sec.querySelector(".responsible-input");
-        let name = input ? input.value.trim() : "N/A";
-        let elapsed = sec.getElapsedTime ? sec.getElapsedTime() : 0;
-        responsibleGroup[name] = (responsibleGroup[name] || 0) + elapsed;
-      }
-    });
-    
-    // Primero se muestran los asignados (responsable)
-    if (Object.keys(responsibleGroup).length > 0) {
-      let idx = 0;
-      Object.entries(responsibleGroup).forEach(([name, totalTime]) => {
-        let color = personColors[idx % personColors.length];
-        doc.setFillColor(...color);
-        doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(12);
-        doc.text(`Asignado: ${name}   Tiempo usado: ${formatTime(totalTime)}`, margin + 2, y + 6);
-        y += rowHeight + 2;
-        idx++;
-        if (y > 270) { doc.addPage(); y = 20; }
-      });
-    }
-    
-    // Luego se muestran los comentarios
-    if (Object.keys(commentGroup).length > 0) {
-      doc.setFontSize(12);
-      let idx = 0;
-      for (let [name, totalTime] of Object.entries(commentGroup)) {
-        let color = personColors[idx % personColors.length];
-        doc.setFillColor(...color);
-        doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
-        doc.setTextColor(0, 0, 0);
-        doc.text(`${name}   Tiempo usado: ${formatTime(totalTime)}`, margin + 2, y + 6);
-        y += rowHeight + 2;
-        idx++;
-        if (y > 270) { doc.addPage(); y = 20; }
-      }
-    }
-    
-    // Por último, se muestran las secciones de consejo (si las hubiera)
-    if (consejos.length > 0) {
-      consejos.forEach((sec, idx) => {
-         let elapsed = sec.getElapsedTime ? sec.getElapsedTime() : 0;
-         let label = `Consejo ${idx+1} del presidente`;
-         let color = personColors[idx % personColors.length];
-         doc.setFillColor(...color);
-         doc.rect(margin, y, pageWidth - 2 * margin, rowHeight, 'F');
-         doc.setTextColor(0, 0, 0);
-         doc.setFontSize(12);
-         doc.text(`${label}   Tiempo usado: ${formatTime(elapsed)}`, margin + 2, y + 6);
-         y += rowHeight + 2;
-         if (y > 270) { doc.addPage(); y = 20; }
-      });
-    }
-    
-    y += 8; // Espacio entre bloques
+    allSectionGroups.push(group);
   });
-  
-  doc.setFontSize(14);
-  doc.text(`Presidente: ${presidentName}`, margin, y + 10);
-  doc.save("reporte_reunion.pdf");
+
+  // Paleta de colores pastel para los encabezados de bloque
+  const blockColors = [
+    [255, 230, 230],  // rosa muy suave
+    [230, 255, 230],  // verde muy suave
+    [230, 230, 255],  // azul muy suave
+    [255, 255, 230],  // amarillo suave
+    [230, 255, 255],  // cian muy suave
+    [255, 230, 255]   // lila muy suave
+  ];
+
+  // Función auxiliar: extraer el tiempo utilizado (se asume formato "mm:ss")
+  function getElapsedTimeForSection(sec) {
+    const timerDisplay = sec.querySelector('.timer-display');
+    if (timerDisplay) {
+      const text = timerDisplay.textContent.trim();
+      const match = text.match(/^(\d+:\d{2})/);
+      if (match) {
+        return match[1];
+      }
+    }
+    return "00:00";
+  }
+
+  // Función auxiliar para formatear segundos a "m:ss"
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  // Función auxiliar para convertir "mm:ss" a segundos
+  function parseTime(timeStr) {
+    const parts = timeStr.split(":");
+    if (parts.length === 2) {
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+    return parseInt(timeStr, 10) || 0;
+  }
+
+  // Procesar cada grupo (cada h2 y sus secciones)
+  allSectionGroups.forEach((group, groupIndex) => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    // Título de grupo con fuente grande, en negro y centrado
+    const color = blockColors[groupIndex % blockColors.length];
+    doc.setFillColor(...color);
+    doc.rect(margin, y, pageWidth - 2 * margin, 14, 'F');
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(group.title, pageWidth / 2, y + 10, { align: "center" });
+    y += 18;
+
+    // Restauramos fuente normal para el contenido
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    group.sections.forEach((sec, secIndex) => {
+      // Caso 1: Bloques de "Canción" o "Oración" (sin participantes)
+      if (group.title.toLowerCase().includes("canción") || group.title.toLowerCase().includes("oración")) {
+        const allocated = sec.getAttribute("data-allocated") || "0";
+        const assigned = formatTime(parseInt(allocated, 10));
+        doc.text(`Tiempo asignado: ${assigned}`, margin + 5, y);
+        y += 8;
+        const elapsed = getElapsedTimeForSection(sec);
+        // Determinar color según tiempo: verde si en tiempo, rojo si se excede
+        const elapsedSec = parseTime(elapsed);
+        const allocatedSec = parseInt(allocated, 10);
+        const timeColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
+        doc.setTextColor(timeColor);
+        doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
+        doc.setTextColor(0, 0, 0);
+        y += 10;
+      }
+      // Caso 2: Sección de Consejo (clase "consejo")
+      else if (sec.classList.contains("consejo")) {
+        // Imprimir el encabezado con el nombre del presidente
+        doc.setTextColor("#388e3c"); // Por defecto verde; si se excede, luego se cambia
+        doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
+        y += 8;
+        let allocated = sec.getAttribute("data-allocated") || "0";
+        const allocatedSec = parseInt(allocated, 10);
+        if (allocated) {
+          allocated = formatTime(allocatedSec);
+          doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
+          y += 8;
+        }
+        const elapsed = getElapsedTimeForSection(sec);
+        const elapsedSec = parseTime(elapsed);
+        const nameColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
+        doc.setTextColor(nameColor);
+        doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
+        doc.setTextColor(0, 0, 0);
+        y += 10;
+      }
+      // Caso 3: Secciones normales
+      else {
+        // Imprimir campos del encabezado (título, responsable, etc.)
+        const fields = sec.querySelectorAll('.section-header input:not(.allocated-input)');
+        fields.forEach(field => {
+          let label = field.previousElementSibling ? field.previousElementSibling.textContent.trim() : "Título";
+          let value = field.value;
+          // Para "Palabras de introducción" o "Resumen y Anuncios" se usa el nombre del presidente si está vacío
+          if (!value && (sec.parentElement.id === "block-0b" || sec.parentElement.id === "block-4")) {
+            value = presidentName;
+          }
+          // Si es el campo de responsable, cambiar color según tiempo utilizado
+          if (field.classList.contains("responsible-input")) {
+            const allocated = sec.getAttribute("data-allocated") || "0";
+            const allocatedSec = parseInt(allocated, 10);
+            const elapsed = getElapsedTimeForSection(sec);
+            const elapsedSec = parseTime(elapsed);
+            const respColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
+            doc.setTextColor(respColor);
+            doc.text(`${label}: ${value}`, margin + 5, y);
+            doc.setTextColor(0, 0, 0);
+          } else {
+            doc.text(`${label}: ${value}`, margin + 5, y);
+          }
+          y += 8;
+        });
+        let allocated = sec.getAttribute("data-allocated");
+        if (allocated) {
+          allocated = formatTime(parseInt(allocated, 10));
+          doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
+          y += 8;
+        }
+        const elapsed = getElapsedTimeForSection(sec);
+        doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
+        y += 8;
+        // Recorrer comentarios (todos los <li> del contenedor de comentarios)
+        const commentList = sec.querySelector('.comment-container .comment-list');
+        if (commentList && commentList.children.length > 0) {
+          doc.setFont(undefined, 'bold');
+          doc.text("Comentarios:", margin + 5, y);
+          y += 8;
+          doc.setFont(undefined, 'normal');
+          const commentItems = Array.from(commentList.children);
+          commentItems.forEach(comment => {
+            const commentText = comment.textContent.trim();
+            doc.text(`• ${commentText} (30s)`, margin + 10, y);
+            y += 8;
+            if (y > 270) { doc.addPage(); y = 20; }
+          });
+        }
+        y += 5;
+      }
+      if (y > 270) { doc.addPage(); y = 20; }
+    });
+    y += 10;
+  });
+
+  doc.setFontSize(12);
+  doc.text(`Reporte generado el: ${new Date().toLocaleDateString()}`, margin, y + 10);
+  doc.save("reporte_reunion_completo.pdf");
   disableAllSectionControls();
 });
 
-/* ACTUALIZA LOS NOMBRES EN ELEMENTOS .council-responsible (si existen) */
 document.getElementById("president-name").addEventListener("input", function() {
   let presidentName = this.value || "No especificado";
   document.querySelectorAll(".council-responsible").forEach(el => {
@@ -394,30 +425,12 @@ document.getElementById("president-name").addEventListener("input", function() {
   });
 });
 
-// Función de formateo de tiempo (por ejemplo, "m:ss")
-function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-// Función para convertir un string de tiempo "m:ss" o "s" a segundos
-function parseTime(timeStr) {
-  const parts = timeStr.split(":");
-  if (parts.length === 2) {
-    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-  }
-  return parseInt(timeStr, 10) || 0;
-}
-
-// Función para deshabilitar los controles de sección al generar el reporte
 function disableAllSectionControls() {
   document.querySelectorAll('.section-controls button').forEach(button => {
     button.disabled = true;
   });
 }
 
-// Inicia la aplicación al cargar el DOM
 window.addEventListener('DOMContentLoaded', initializeApp);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
@@ -425,7 +438,6 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.log("Error en Service Worker:", err));
 }
 
-// Función de inicialización de la aplicación (puedes agregar más lógica aquí)
 function initializeApp() {
   console.log("Aplicación iniciada");
 }
