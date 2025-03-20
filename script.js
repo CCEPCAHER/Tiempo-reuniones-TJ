@@ -34,10 +34,17 @@ document.querySelectorAll('.section').forEach(section => {
   const pauseBtn = section.querySelector('.pause-btn');
   const resetBtn = section.querySelector('.reset-btn');
   
+  // Variables para llevar el tiempo acumulado y la marca de inicio
   let currentTime = 0;
+  let accumulatedTime = 0;
+  let startTimestamp = null;
   let intervalId = null;
   
   function updateDisplay() {
+    // Si el timer está corriendo, recalcular el tiempo usando la diferencia real
+    if (intervalId && startTimestamp !== null) {
+      currentTime = accumulatedTime + Math.floor((Date.now() - startTimestamp) / 1000);
+    }
     const diff = currentTime - allocatedTime;
     const sign = diff < 0 ? "-" : (diff > 0 ? "+" : "");
     timerDisplay.innerHTML = `<span class="time-main">${formatTime(currentTime)}</span> <span class="time-diff">(${sign}${formatTime(Math.abs(diff))})</span>`;
@@ -55,16 +62,19 @@ document.querySelectorAll('.section').forEach(section => {
     // En algunos casos se evita iniciar el timer si no se ha iniciado la reunión
     if (!meetingStart && !section.classList.contains('consejo') && !section.classList.contains('with-comments')) return;
     if (intervalId) return;
-    intervalId = setInterval(() => {
-      currentTime++;
-      updateDisplay();
-    }, 1000);
+    startTimestamp = Date.now();
+    intervalId = setInterval(updateDisplay, 1000);
   }
   
   function pauseTimer() {
     if (intervalId) {
       clearInterval(intervalId);
       intervalId = null;
+      if (startTimestamp) {
+        accumulatedTime += Math.floor((Date.now() - startTimestamp) / 1000);
+      }
+      startTimestamp = null;
+      updateDisplay();
     }
   }
   
@@ -86,6 +96,8 @@ document.querySelectorAll('.section').forEach(section => {
       allocatedTime = parseInt(allocatedInput.value, 10);
       if (!resetBtn.disabled) {
         currentTime = 0;
+        accumulatedTime = 0;
+        startTimestamp = null;
         updateDisplay();
         updateSectionTimes();
       }
@@ -136,12 +148,18 @@ document.querySelectorAll('.with-comments').forEach(section => {
   const commentCountSpan = section.querySelector('.comment-count');
   const commentList = section.querySelector('.comment-list');
   
+  // Variables para llevar el tiempo acumulado de comentarios
   let commentTime = 0;
+  let commentAccumulatedTime = 0;
+  let commentStartTimestamp = null;
   let commentInterval = null;
   let commentCount = 0;
   let commentsData = [];
   
   function updateCommentDisplay() {
+    if (commentInterval && commentStartTimestamp !== null) {
+      commentTime = commentAccumulatedTime + Math.floor((Date.now() - commentStartTimestamp) / 1000);
+    }
     commentTimerDisplay.textContent = formatTime(commentTime);
     if (commentTime <= 30) {
       commentTimerDisplay.classList.remove('red');
@@ -154,26 +172,29 @@ document.querySelectorAll('.with-comments').forEach(section => {
   
   commentStartBtn.addEventListener('click', () => {
     if (!commentInterval) {
-      commentInterval = setInterval(() => {
-        commentTime++;
-        updateCommentDisplay();
-      }, 1000);
+      commentStartTimestamp = Date.now();
+      commentInterval = setInterval(updateCommentDisplay, 1000);
     }
   });
   
-  commentEndBtn.addEventListener('click', () => {
+  function pauseCommentTimer() {
     if (commentInterval) {
       clearInterval(commentInterval);
       commentInterval = null;
+      if (commentStartTimestamp) {
+        commentAccumulatedTime += Math.floor((Date.now() - commentStartTimestamp) / 1000);
+      }
+      commentStartTimestamp = null;
+      updateCommentDisplay();
     }
-    updateCommentDisplay();
+  }
+  
+  commentEndBtn.addEventListener('click', () => {
+    pauseCommentTimer();
   });
   
   nextCommentBtn.addEventListener('click', () => {
-    if (commentInterval) {
-      clearInterval(commentInterval);
-      commentInterval = null;
-    }
+    pauseCommentTimer();
     let name = commentNameInput.value.trim() || "Sin nombre";
     let duration = commentTime;
     let exceeded = duration > 30;
@@ -191,7 +212,10 @@ document.querySelectorAll('.with-comments').forEach(section => {
     commentList.appendChild(li);
     setTimeout(() => { li.style.backgroundColor = ""; }, 2000);
     commentsData.push({ name, duration, exceeded });
+    // Reiniciar el contador de comentarios
     commentTime = 0;
+    commentAccumulatedTime = 0;
+    commentStartTimestamp = null;
     updateCommentDisplay();
     commentNameInput.value = "";
   });
@@ -254,7 +278,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
 });
 
 
-  document.getElementById('generate-pdf').addEventListener('click', () => {
+document.getElementById('generate-pdf').addEventListener('click', () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
