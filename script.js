@@ -441,11 +441,22 @@ document.querySelectorAll('.allocated-input').forEach(input => {
           doc.text(`Asignado: ${assignedName}`, margin + 5, y);
           y += rowHeight;
         }
+        // --- Extracción del título ---
         let titleText = "";
         const titleElem = sec.querySelector('.section-header .section-title');
-        titleText = (titleElem && titleElem.textContent.trim()) ? titleElem.textContent.trim() : "Sin título";
+        if (titleElem) {
+          if (titleElem.tagName.toLowerCase() === "input") {
+            // Se usa el valor; si está vacío, se utiliza el placeholder
+            titleText = titleElem.value.trim() || titleElem.placeholder || "Sin título";
+          } else {
+            titleText = titleElem.textContent.trim() || "Sin título";
+          }
+        } else {
+          titleText = "Sin título";
+        }
         doc.text(`Título: ${titleText}`, margin + 5, y);
         y += rowHeight;
+        // ------------------------------
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
@@ -456,12 +467,37 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         doc.text(`Tiempo usado: ${elapsed}`, margin + 5, y);
         y += rowHeight;
       }
+      
+      // Bloque extra para imprimir los comentarios del auditorio (para secciones with-comments)
+      if (sec.classList.contains("with-comments")) {
+        const commentList = sec.querySelector('.comment-list');
+        if (commentList) {
+          const comments = commentList.querySelectorAll('li');
+          if (comments.length > 0) {
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(12);
+            doc.text("Comentarios del Auditorio:", margin + 5, y);
+            y += rowHeight;
+            comments.forEach(li => {
+              let commentText = li.textContent;
+              doc.text(commentText, margin + 10, y);
+              y += rowHeight;
+              if (y > 270) { doc.addPage(); y = 20; }
+            });
+            // Restaurar fuente normal
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            y += rowHeight;
+          }
+        }
+      }
+      
       if (y > 270) { doc.addPage(); y = 20; }
     });
     y += 10;
   });
 
-    // --- Pie del reporte: imprimir ambas horas ---
+  // --- Pie del reporte: imprimir ambas horas ---
   // Hora de fin estimada (usando meetingStart y duración total)
   if (meetingStart) {
     const estimatedEndTime = new Date(meetingStart.getTime() + totalMeetingDuration * 1000);
@@ -478,7 +514,6 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
   doc.setTextColor(0, 153, 51); // Verde vibrante
-  // Si se sigue solapando, podrías añadir una nueva página
   if (y > 250) {
     doc.addPage();
     y = 20;
