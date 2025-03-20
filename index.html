@@ -56,31 +56,28 @@
     </section>
 
     <!-- Bloque 0b: Introducción – Palabras de introducción (1 min) -->
-    <section id="block-0b">
-      <h2>Palabras de introducción (1 min)</h2>
-      <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
-        <div class="section-header">
-          <!-- Se mantiene el input para el título; se añade span para responsable que se actualizará con el nombre del presidente -->
-          <input type="text" class="section-title" placeholder="Palabras de introducción">
-          <span class="council-responsible"></span>
-          <label>Tiempo (seg):</label>
-          <input type="number" class="allocated-input" value="60">
-          <label>Inicio:</label>
-          <input type="text" class="start-time" readonly>
-          <label>Fin:</label>
-          <input type="text" class="end-time" readonly>
-        </div>
-        <div class="timer-display" id="timer-block-0b-0">
-          00:00 (<span class="time-diff">00:00</span>)
-        </div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-    </section>
-
+   <!-- Bloque 0b: Introducción – Palabras de introducción (1 min) -->
+<section id="block-0b">
+  <h2>Palabras de introducción (1 min)</h2>
+  <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
+    <div class="section-header">
+      <!-- Se elimina el input para el título y se reemplaza por un span con el texto fijo -->
+     
+      <label>Inicio:</label>
+      <input type="text" class="start-time" readonly>
+      <label>Fin:</label>
+      <input type="text" class="end-time" readonly>
+    </div>
+    <div class="timer-display" id="timer-block-0b-0">
+      00:00 (<span class="time-diff">00:00</span>)
+    </div>
+    <div class="section-controls">
+      <button class="start-btn">Iniciar</button>
+      <button class="pause-btn">Pausar</button>
+      <button class="reset-btn">Finalizar</button>
+    </div>
+  </div>
+</section>
     <!-- Bloque 1: Tesoros de la Biblia (10 min) -->
     <section id="block-1">
       <h2>Tesoros de la Biblia (10 min)</h2>
