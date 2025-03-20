@@ -262,6 +262,13 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   let y = 20;
   const rowHeight = 8;
 
+  // Función para formatear la hora (formato HH:MM)
+  function formatDateTime(date) {
+    const hrs = String(date.getHours()).padStart(2, "0");
+    const mins = String(date.getMinutes()).padStart(2, "0");
+    return `${hrs}:${mins}`;
+  }
+
   // Encabezado general del PDF
   doc.setFillColor(180, 0, 100);
   doc.rect(0, 0, pageWidth, 15, 'F');
@@ -276,6 +283,11 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   const presidentName = document.getElementById("president-name").value || "N/A";
   doc.setFontSize(14);
   doc.text(`Presidente: ${presidentName}`, margin, y);
+  y += 10;
+
+  // Mostrar hora de inicio
+  const startTimeStr = meetingStart ? formatDateTime(meetingStart) : "No iniciado";
+  doc.text(`Hora de inicio: ${startTimeStr}`, margin, y);
   y += 10;
 
   // ---------------------------
@@ -381,8 +393,8 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
 
-    group.sections.forEach((sec, secIndex) => {
-      // Para los casos "Canción" u "Oración" se mantiene el procesamiento previo (si aplica)
+    group.sections.forEach((sec) => {
+      // Caso 1: Bloques de "Canción" u "Oración"
       if (group.title.toLowerCase().includes("canción") || group.title.toLowerCase().includes("oración")) {
         const allocated = sec.getAttribute("data-allocated") || "0";
         const assigned = formatTime(parseInt(allocated, 10));
@@ -397,7 +409,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         doc.setTextColor(0, 0, 0);
         y += 10;
       }
-      // Para secciones "Consejo"
+      // Caso 2: Sección de Consejo
       else if (sec.classList.contains("consejo")) {
         doc.setFontSize(12);
         doc.setTextColor("#000");
@@ -416,15 +428,12 @@ document.querySelectorAll('.allocated-input').forEach(input => {
       }
       // Caso 3: Secciones normales (imprimir nombre asignado, título y tiempos)
       else {
-        // Imprimir el nombre asignado (usamos el valor del input y, si está vacío, "Sin asignar")
         let assignedName = "";
         const assignedElem = sec.querySelector('.assigned-names') || sec.querySelector('.responsible-input');
         if (assignedElem) {
-          if (assignedElem.tagName.toLowerCase() === "input") {
-            assignedName = assignedElem.value.trim() || "Sin asignar";
-          } else {
-            assignedName = assignedElem.textContent.trim() || "Sin asignar";
-          }
+          assignedName = (assignedElem.tagName.toLowerCase() === "input")
+            ? assignedElem.value.trim() || "Sin asignar"
+            : assignedElem.textContent.trim() || "Sin asignar";
         }
         if (assignedName) {
           doc.setFont("helvetica", "normal");
@@ -432,24 +441,17 @@ document.querySelectorAll('.allocated-input').forEach(input => {
           doc.text(`Asignado: ${assignedName}`, margin + 5, y);
           y += rowHeight;
         }
-        // Imprimir el título de la asignación
         let titleText = "";
         const titleElem = sec.querySelector('.section-header .section-title');
-        if (titleElem && titleElem.textContent.trim()) {
-          titleText = titleElem.textContent.trim();
-        } else {
-          titleText = "Sin título";
-        }
+        titleText = (titleElem && titleElem.textContent.trim()) ? titleElem.textContent.trim() : "Sin título";
         doc.text(`Título: ${titleText}`, margin + 5, y);
         y += rowHeight;
-        // Imprimir el tiempo asignado
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
           doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
           y += rowHeight;
         }
-        // Imprimir el tiempo usado
         const elapsed = getElapsedTimeForSection(sec);
         doc.text(`Tiempo usado: ${elapsed}`, margin + 5, y);
         y += rowHeight;
@@ -459,12 +461,39 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     y += 10;
   });
 
-  // Resumen: se incluye nuevamente el nombre del presidente y la fecha
+    // --- Pie del reporte: imprimir ambas horas ---
+  // Hora de fin estimada (usando meetingStart y duración total)
+  if (meetingStart) {
+    const estimatedEndTime = new Date(meetingStart.getTime() + totalMeetingDuration * 1000);
+    const estimatedEndTimeStr = formatDateTime(estimatedEndTime);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    doc.setTextColor(204, 0, 102); // Rojo vibrante
+    doc.text(`Hora de fin estimada: ${estimatedEndTimeStr}`, pageWidth / 2, y, { align: "center" });
+    y += 30; // Aumentamos el espacio para separar ambas horas
+  }
+  // Hora de fin real (la hora actual)
+  const realEndTime = new Date();
+  const realEndTimeStr = formatDateTime(realEndTime);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(28);
+  doc.setTextColor(0, 153, 51); // Verde vibrante
+  // Si se sigue solapando, podrías añadir una nueva página
+  if (y > 250) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.text(`Hora de fin real: ${realEndTimeStr}`, pageWidth / 2, y, { align: "center" });
+  y += 30;
+
+  // Resumen final
   doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += rowHeight;
   doc.setFontSize(12);
   doc.text(`Reporte generado el: ${new Date().toLocaleDateString()}`, margin, y + 10);
+
   doc.save("reporte_reunion_completo.pdf");
   disableAllSectionControls();
 });
