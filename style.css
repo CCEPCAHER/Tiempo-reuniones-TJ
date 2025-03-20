@@ -4,6 +4,50 @@ html {
   -ms-text-size-adjust: 100%;
 }
 
+/* Títulos con colores más llamativos */
+/* SECCIONES */
+section {
+  margin-bottom: 24px;
+  padding: 16px;
+  border-left: 4px solid #ddd;
+  border-radius: 6px;
+  /* La siguiente línea se sobrescribirá para cada sección individualmente */
+  background: #fafafa;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+section h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #222;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+
+/* COLORES INDIVIDUALIZADOS PARA 8 SECCIONES */
+section:nth-of-type(1) {
+  background-color: #ffe0b2;
+}
+section:nth-of-type(2) {
+  background-color: #dcedc8;
+}
+section:nth-of-type(3) {
+  background-color: #bbdefb;
+}
+section:nth-of-type(4) {
+  background-color: #f8bbd0;
+}
+section:nth-of-type(5) {
+  background-color: #c8e6c9;
+}
+section:nth-of-type(6) {
+  background-color: #d1c4e9;
+}
+section:nth-of-type(7) {
+  background-color: #ffccbc;
+}
+section:nth-of-type(8) {
+  background-color: #b3e5fc;
+}
 /* RESET */
 * {
   margin: 0;
