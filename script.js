@@ -278,7 +278,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
 });
 
 
-document.getElementById('generate-pdf').addEventListener('click', () => {
+document.getElementById('generate-pdf').addEventListener('click', () => { 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -293,8 +293,8 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     return `${hrs}:${mins}`;
   }
 
-  // Encabezado general del PDF
-  doc.setFillColor(180, 0, 100);
+  // Encabezado general del PDF con fondo azul oscuro y fuente Helvetica
+  doc.setFillColor(10, 50, 100); // Azul oscuro
   doc.rect(0, 0, pageWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -302,12 +302,17 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   doc.text("Reporte Final de la Reunión", pageWidth / 2, 12, { align: "center" });
 
   y = 30;
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(40, 40, 40); // Gris oscuro
   // Se obtiene el nombre del presidente (para introducción y resumen)
   const presidentName = document.getElementById("president-name").value || "N/A";
-  doc.setFontSize(14);
+  // Resaltar el nombre del participante: mayor tamaño y en negrita
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
   doc.text(`Presidente: ${presidentName}`, margin, y);
-  y += 10;
+  y += 12;
+  // Restaurar fuente normal para el resto del contenido
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(14);
 
   // Mostrar hora de inicio
   const startTimeStr = meetingStart ? formatDateTime(meetingStart) : "No iniciado";
@@ -361,14 +366,14 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     allSectionGroups.push(group);
   });
 
-  // Paleta de colores pastel para encabezados de grupo
+  // Paleta de colores pastel para encabezados de grupo (tonos suaves)
   const blockColors = [
-    [255, 230, 230],
-    [230, 255, 230],
-    [230, 230, 255],
-    [255, 255, 230],
-    [230, 255, 255],
-    [255, 230, 255]
+    [220, 235, 245],
+    [235, 245, 220],
+    [245, 220, 235],
+    [240, 240, 245],
+    [220, 245, 245],
+    [245, 235, 220]
   ];
 
   // Función auxiliar: extraer el tiempo utilizado (se asume formato "mm:ss")
@@ -403,11 +408,11 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   // Procesar cada grupo (cada h2 y sus secciones)
   allSectionGroups.forEach((group, groupIndex) => {
     if (y > 270) { doc.addPage(); y = 20; }
-    // Título del grupo (centrado con fondo de color pastel)
+    // Título del grupo (centrado con fondo en tono pastel)
     const color = blockColors[groupIndex % blockColors.length];
     doc.setFillColor(...color);
     doc.rect(margin, y, pageWidth - 2 * margin, 14, 'F');
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(10, 50, 100); // Azul oscuro para contraste
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text(group.title, pageWidth / 2, y + 10, { align: "center" });
@@ -427,16 +432,16 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         const elapsed = getElapsedTimeForSection(sec);
         const elapsedSec = parseTime(elapsed);
         const allocatedSec = parseInt(allocated, 10);
-        const timeColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
+        const timeColor = (elapsedSec <= allocatedSec) ? "#2E7D32" : "#C62828"; // Verde para OK, rojo para excedido
         doc.setTextColor(timeColor);
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
-        doc.setTextColor(0, 0, 0);
+        doc.setTextColor(40, 40, 40);
         y += 10;
       }
       // Caso 2: Sección de Consejo
       else if (sec.classList.contains("consejo")) {
         doc.setFontSize(12);
-        doc.setTextColor("#000");
+        doc.setTextColor(40, 40, 40);
         doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
         y += 8;
         const allocated = sec.getAttribute("data-allocated") || "0";
@@ -460,17 +465,22 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
             : assignedElem.textContent.trim() || "Sin asignar";
         }
         if (assignedName) {
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
+          // Resaltar el nombre del responsable: mayor tamaño, negrita y color distintivo
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(16);
+          doc.setTextColor(50, 100, 200); // Azul distintivo
           doc.text(`Asignado: ${assignedName}`, margin + 5, y);
           y += rowHeight;
+          // Restaurar configuración
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(40, 40, 40);
         }
         // --- Extracción del título ---
         let titleText = "";
         const titleElem = sec.querySelector('.section-header .section-title');
         if (titleElem) {
           if (titleElem.tagName.toLowerCase() === "input") {
-            // Se usa el valor; si está vacío, se utiliza el placeholder
             titleText = titleElem.value.trim() || titleElem.placeholder || "Sin título";
           } else {
             titleText = titleElem.textContent.trim() || "Sin título";
@@ -478,18 +488,31 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         } else {
           titleText = "Sin título";
         }
+        // Se utiliza una fuente clara y de mayor tamaño para los títulos y tiempos
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
         doc.text(`Título: ${titleText}`, margin + 5, y);
         y += rowHeight;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
         // ------------------------------
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
           doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
           y += rowHeight;
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
         }
         const elapsed = getElapsedTimeForSection(sec);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
         doc.text(`Tiempo usado: ${elapsed}`, margin + 5, y);
         y += rowHeight;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
       }
       
       // Bloque extra para imprimir los comentarios del auditorio (para secciones with-comments)
@@ -498,19 +521,26 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         if (commentList) {
           const comments = commentList.querySelectorAll('li');
           if (comments.length > 0) {
+            // Título de comentarios en mayor tamaño y color violeta
             doc.setFont("helvetica", "italic");
-            doc.setFontSize(12);
+            doc.setFontSize(16);
+            doc.setTextColor(150, 0, 150); // Violeta
             doc.text("Comentarios del Auditorio:", margin + 5, y);
             y += rowHeight;
+            // Cada comentario en tamaño un poco menor y color similar
             comments.forEach(li => {
               let commentText = li.textContent;
+              doc.setFont("helvetica", "italic");
+              doc.setFontSize(14);
+              doc.setTextColor(150, 0, 150);
               doc.text(commentText, margin + 10, y);
               y += rowHeight;
               if (y > 270) { doc.addPage(); y = 20; }
             });
-            // Restaurar fuente normal
+            // Restaurar configuración
             doc.setFont("helvetica", "normal");
             doc.setFontSize(12);
+            doc.setTextColor(40, 40, 40);
             y += rowHeight;
           }
         }
@@ -528,16 +558,16 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     const estimatedEndTimeStr = formatDateTime(estimatedEndTime);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
-    doc.setTextColor(204, 0, 102); // Rojo vibrante
+    doc.setTextColor(180, 30, 80); // Rojo elegante
     doc.text(`Hora de fin estimada: ${estimatedEndTimeStr}`, pageWidth / 2, y, { align: "center" });
-    y += 30; // Aumentamos el espacio para separar ambas horas
+    y += 30;
   }
   // Hora de fin real (la hora actual)
   const realEndTime = new Date();
   const realEndTimeStr = formatDateTime(realEndTime);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
-  doc.setTextColor(0, 153, 51); // Verde vibrante
+  doc.setTextColor(0, 100, 0); // Verde profesional
   if (y > 250) {
     doc.addPage();
     y = 20;
@@ -547,7 +577,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
 
   // Resumen final
   doc.setFontSize(14);
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(40, 40, 40);
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += rowHeight;
   doc.setFontSize(12);
