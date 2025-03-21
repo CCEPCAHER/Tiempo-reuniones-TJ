@@ -48,6 +48,7 @@ section:nth-of-type(7) {
 section:nth-of-type(8) {
   background-color: #b3e5fc;
 }
+
 /* RESET */
 * {
   margin: 0;
@@ -102,6 +103,15 @@ h1 {
   font-size: 15px;
   border: 1px solid #bbb;
   border-radius: 4px;
+}
+
+/* Contenedor para los campos de horario (inicio y fin) */
+.time-container {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;     /* Centra verticalmente */
+  gap: 10px;               /* Espacio entre los campos */
+  width: 100%;             /* Ocupa todo el ancho disponible */
 }
 
 /* CONTROLES PRINCIPALES */
@@ -169,24 +179,35 @@ section h2 {
 /* ENCABEZADO DE SECCIÓN */
 .section-header {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; /* Apila los elementos verticalmente */
   gap: 10px;
   margin-bottom: 10px;
-  align-items: center;
+  align-items: stretch;
 }
 .section-header label {
   font-weight: bold;
   font-size: 15px;
 }
+/* El input del título ahora ocupa el 100% */
 .section-header input.section-title {
-  flex: 6;
+  width: 100%;
   padding: 8px;
   font-size: 15px;
   border: 1px solid #1a0303;
   border-radius: 4px;
 }
+
+/* Si el span del temporizador forma parte del encabezado, forzamos que ocupe el 100% y se ubique debajo */
+.section-header .timer-display {
+  width: 100%;
+  display: block;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* Input de responsable, se mantiene al 100% */
 .responsible-input {
-  width:100%;
+  width: 100%;
   padding: 8px;
   font-size: 15px;
   border: 1px solid #CCC;
@@ -203,7 +224,6 @@ section h2 {
   border-radius: 4px;
 }
 
-/* CAMPOS DE HORARIO */
 .start-time,
 .end-time {
   width: 75px;
@@ -216,24 +236,11 @@ section h2 {
   text-align: center;
 }
 
-/* DISPLAY DEL TEMPORIZADOR */
+/* DISPLAY DEL TEMPORIZADOR (si se usa fuera de .section-header) */
 .timer-display {
   text-align: center;
   margin-bottom: 2px;
   font-weight: bold;
-}
-.time-main {
-  font-size: 80px;
-  font-weight: bold;
-  display: inline-block;
-  margin-right: 8px;
-}
-.time-diff {
-  font-size: 16px;
-  display: inline-block;
-  width: 70px;
-  text-align: center;
-  margin-left: 8px;
 }
 
 /* BOTONES DE SECCIÓN */
