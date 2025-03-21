@@ -79,8 +79,8 @@ body {
 h1 {
   text-align: center;
   font-size: 28px;
-  color: #444;
-  margin-bottom: 20px;
+  color: #09c341;
+  margin-bottom: 2px;
   font-weight: bold;
   letter-spacing: 0.5px;
 }
@@ -90,15 +90,15 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 .president-section label {
   margin-right: 10px;
   font-weight: bold;
 }
 .president-section input {
-  width: 220px;
-  padding: 10px;
+  width: 300px;
+  padding: 8px;
   font-size: 15px;
   border: 1px solid #bbb;
   border-radius: 4px;
@@ -143,23 +143,23 @@ h1 {
 /* SECCIONES */
 section {
   margin-bottom: 24px;
-  padding: 16px;
-  border-left: 4px solid #ddd;
+  padding: 10px;
+  border-left: 4px solid #decaca;
   border-radius: 6px;
-  background: #fafafa;
+  background: #d2a4a4;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 section h2 {
   font-size: 22px;
   margin-bottom: 12px;
   color: #222;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #280303;
   padding-bottom: 6px;
 }
 
 /* Tarjeta para secciones (estilo moderno) */
 .section {
-  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  background: linear-gradient(135deg, #e1b6e0, #f1f5f9);
   border: 1px solid #e0e7ee;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -179,14 +179,14 @@ section h2 {
   font-size: 15px;
 }
 .section-header input.section-title {
-  flex: 2;
+  flex: 6;
   padding: 8px;
   font-size: 15px;
-  border: 1px solid #CCC;
+  border: 1px solid #1a0303;
   border-radius: 4px;
 }
 .responsible-input {
-  flex: 3;
+  width:100%;
   padding: 8px;
   font-size: 15px;
   border: 1px solid #CCC;
@@ -219,11 +219,11 @@ section h2 {
 /* DISPLAY DEL TEMPORIZADOR */
 .timer-display {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
   font-weight: bold;
 }
 .time-main {
-  font-size: 48px;
+  font-size: 80px;
   font-weight: bold;
   display: inline-block;
   margin-right: 8px;
