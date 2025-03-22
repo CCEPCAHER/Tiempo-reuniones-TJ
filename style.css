@@ -48,7 +48,6 @@ section:nth-of-type(7) {
 section:nth-of-type(8) {
   background-color: #b3e5fc;
 }
-
 /* RESET */
 * {
   margin: 0;
@@ -80,8 +79,8 @@ body {
 h1 {
   text-align: center;
   font-size: 28px;
-  color: #09c341;
-  margin-bottom: 2px;
+  color: #444;
+  margin-bottom: 20px;
   font-weight: bold;
   letter-spacing: 0.5px;
 }
@@ -91,27 +90,18 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 .president-section label {
   margin-right: 10px;
   font-weight: bold;
 }
 .president-section input {
-  width: 300px;
-  padding: 8px;
+  width: 220px;
+  padding: 10px;
   font-size: 15px;
   border: 1px solid #bbb;
   border-radius: 4px;
-}
-
-/* Contenedor para los campos de horario (inicio y fin) */
-.time-container {
-  display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center;     /* Centra verticalmente */
-  gap: 10px;               /* Espacio entre los campos */
-  width: 100%;             /* Ocupa todo el ancho disponible */
 }
 
 /* CONTROLES PRINCIPALES */
@@ -153,23 +143,23 @@ h1 {
 /* SECCIONES */
 section {
   margin-bottom: 24px;
-  padding: 10px;
-  border-left: 4px solid #decaca;
+  padding: 16px;
+  border-left: 4px solid #ddd;
   border-radius: 6px;
-  background: #d2a4a4;
+  background: #fafafa;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 section h2 {
   font-size: 22px;
   margin-bottom: 12px;
   color: #222;
-  border-bottom: 1px solid #280303;
+  border-bottom: 1px solid #eee;
   padding-bottom: 6px;
 }
 
 /* Tarjeta para secciones (estilo moderno) */
 .section {
-  background: linear-gradient(135deg, #e1b6e0, #f1f5f9);
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
   border: 1px solid #e0e7ee;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -179,35 +169,24 @@ section h2 {
 /* ENCABEZADO DE SECCIÓN */
 .section-header {
   display: flex;
-  flex-direction: column; /* Apila los elementos verticalmente */
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 10px;
-  align-items: stretch;
+  align-items: center;
 }
 .section-header label {
   font-weight: bold;
   font-size: 15px;
 }
-/* El input del título ahora ocupa el 100% */
 .section-header input.section-title {
-  width: 100%;
+  flex: 2;
   padding: 8px;
   font-size: 15px;
-  border: 1px solid #1a0303;
+  border: 1px solid #CCC;
   border-radius: 4px;
 }
-
-/* Si el span del temporizador forma parte del encabezado, forzamos que ocupe el 100% y se ubique debajo */
-.section-header .timer-display {
-  width: 100%;
-  display: block;
-  text-align: center;
-  margin-top: 8px;
-}
-
-/* Input de responsable, se mantiene al 100% */
 .responsible-input {
-  width: 100%;
+  flex: 3;
   padding: 8px;
   font-size: 15px;
   border: 1px solid #CCC;
@@ -224,6 +203,7 @@ section h2 {
   border-radius: 4px;
 }
 
+/* CAMPOS DE HORARIO */
 .start-time,
 .end-time {
   width: 75px;
@@ -236,11 +216,24 @@ section h2 {
   text-align: center;
 }
 
-/* DISPLAY DEL TEMPORIZADOR (si se usa fuera de .section-header) */
+/* DISPLAY DEL TEMPORIZADOR */
 .timer-display {
   text-align: center;
-  margin-bottom: 2px;
+  margin-bottom: 10px;
   font-weight: bold;
+}
+.time-main {
+  font-size: 48px;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 8px;
+}
+.time-diff {
+  font-size: 16px;
+  display: inline-block;
+  width: 70px;
+  text-align: center;
+  margin-left: 8px;
 }
 
 /* BOTONES DE SECCIÓN */
