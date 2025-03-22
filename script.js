@@ -267,9 +267,10 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 15;
   let y = 25;
-  const rowHeight = 12; // Espaciado vertical aumentado
+  const rowHeight = 12; // Espaciado vertical
 
   // Función para formatear la hora (formato HH:MM)
   function formatDateTime(date) {
@@ -284,19 +285,22 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold"); // Todo en negrita
   doc.setFontSize(28);
-  doc.text("Reporte Final de la Reunión", pageWidth / 2, 16, { align: "center" });
+  const headerTitle = doc.splitTextToSize("Reporte Final de la Reunión", pageWidth - 2 * margin);
+  doc.text(headerTitle, pageWidth / 2, 16, { align: "center" });
   
   y = 35;
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(18);
+  doc.setFontSize(20);
+  
   // Nombre del presidente
   const presidentName = document.getElementById("president-name").value || "N/A";
   doc.text(`Presidente: ${presidentName}`, margin, y);
-  y += 14;
+  y += 16;
+  
   // Hora de inicio
   const startTimeStr = meetingStart ? formatDateTime(meetingStart) : "No iniciado";
   doc.text(`Hora de inicio: ${startTimeStr}`, margin, y);
-  y += 16;
+  y += 18;
 
   // --- INTEGRACIÓN DE IMAGEN (si existe) ---
   const imageElement = document.getElementById("myImage");
@@ -310,7 +314,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     const imgWidth = pageWidth - 2 * margin;
     const imgHeight = (imageElement.naturalHeight * imgWidth) / imageElement.naturalWidth;
     doc.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-    y += imgHeight + 12;
+    y += imgHeight + 14;
   }
   
   // --- AGRUPACIÓN DE SECCIONES ---
@@ -374,7 +378,8 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   
   // --- PROCESAMIENTO DE GRUPOS Y SECCIONES ---
   allSectionGroups.forEach((group, groupIndex) => {
-    if (y > 260) { doc.addPage(); y = margin; } // Umbral de salto de página ajustado
+    if (y > pageHeight - 40) { doc.addPage(); y = margin; }
+    
     // Encabezado de grupo con fondo pastel
     const color = blockColors[groupIndex % blockColors.length];
     doc.setFillColor(...color);
@@ -382,26 +387,24 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(24);
-    doc.text(group.title, pageWidth / 2, y + 16, { align: "center" });
+    const splitGroupTitle = doc.splitTextToSize(group.title, pageWidth - 2 * margin);
+    doc.text(splitGroupTitle, pageWidth / 2, y + 16, { align: "center" });
     y += 26;
     
-    // Restaurar fuente para el contenido
-    doc.setFont("helvetica", "bold"); // Todo en negrita
+    // Todo el contenido se imprime en negrita y con fuente tamaño 20
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     
     group.sections.forEach((sec) => {
-      // Si estamos en "Seamos mejores maestros" y el apartado no es de consejo, aplicar color especial según asignación
+      // Si estamos en "Seamos mejores maestros" y no es consejo, asignar color especial
       if (group.title.toLowerCase().includes("seamos mejores maestros") && !sec.classList.contains("consejo")) {
         const index = sec.getAttribute("data-section-index");
         let assignmentColor;
         if (index === "0") assignmentColor = "#FF0000";       // Asignación 1: Rojo
         else if (index === "2") assignmentColor = "#0000FF";  // Asignación 2: Azul
         else if (index === "4") assignmentColor = "#008000";  // Asignación 3: Verde
-        if (assignmentColor) {
-          doc.setTextColor(assignmentColor);
-        }
+        if (assignmentColor) { doc.setTextColor(assignmentColor); }
       } else {
-        // Para los demás, se usa negro
         doc.setTextColor(0, 0, 0);
       }
       
@@ -435,7 +438,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
         y += 16;
       }
-      // Caso: Secciones normales
+      // Caso: Secciones normales (donde diferenciamos el nombre y el título)
       else {
         let assignedName = "";
         const assignedElem = sec.querySelector('.assigned-names') || sec.querySelector('.responsible-input');
@@ -457,8 +460,15 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         } else {
           titleText = "Sin título";
         }
-        doc.text(`Título: ${titleText}`, margin + 5, y);
-        y += rowHeight;
+        // Imprimir el título con una fuente diferente y en color azul para diferenciarlo
+        doc.setFont("courier", "bold"); // Fuente diferente
+        doc.setTextColor(0, 102, 204);    // Color azul
+        const splitSectionTitle = doc.splitTextToSize(`Título: ${titleText}`, pageWidth - 2 * margin);
+        doc.text(splitSectionTitle, margin + 5, y);
+        y += splitSectionTitle.length * rowHeight;
+        // Reestablecer la fuente original para el resto
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
@@ -480,16 +490,17 @@ document.querySelectorAll('.allocated-input').forEach(input => {
             y += rowHeight;
             comments.forEach(li => {
               let commentText = li.textContent;
-              doc.text(commentText, margin + 10, y);
-              y += rowHeight;
-              if (y > 260) { doc.addPage(); y = margin; }
+              const splitComment = doc.splitTextToSize(commentText, pageWidth - 2 * margin - 10);
+              doc.text(splitComment, margin + 10, y);
+              y += splitComment.length * rowHeight;
+              if (y > pageHeight - margin) { doc.addPage(); y = margin; }
             });
             y += rowHeight;
           }
         }
       }
       
-      if (y > 260) { doc.addPage(); y = margin; }
+      if (y > pageHeight - margin) { doc.addPage(); y = margin; }
     });
     y += 10;
   });
@@ -508,7 +519,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   const realEndTimeStr = formatDateTime(realEndTime);
   doc.setFontSize(32);
   doc.setTextColor(0, 153, 51);
-  if (y > 240) { doc.addPage(); y = margin; }
+  if (y > pageHeight - 40) { doc.addPage(); y = margin; }
   doc.text(`Hora de fin real: ${realEndTimeStr}`, pageWidth / 2, y, { align: "center" });
   y += 44;
   
