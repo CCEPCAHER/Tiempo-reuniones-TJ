@@ -37,12 +37,13 @@
       <h2>Canción y oración (5 min)</h2>
       <div class="section" data-block-index="0a" data-section-index="0" data-allocated="300">
         <div class="section-header">
-            <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <!-- Se muestra texto estático en lugar de input -->
+        
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-0a-0">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -60,12 +61,13 @@
   <h2>Palabras de introducción (1 min)</h2>
   <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
     <div class="section-header">
-       <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+      <!-- Se elimina el input para el título y se reemplaza por un span con el texto fijo -->
+     
+      <label>Inicio:</label>
+      <input type="text" class="start-time" readonly>
+      <label>Fin:</label>
+      <input type="text" class="end-time" readonly>
+    </div>
     <div class="timer-display" id="timer-block-0b-0">
       00:00 (<span class="time-diff">00:00</span>)
     </div>
@@ -78,20 +80,20 @@
 </section>
     <!-- Bloque 1: Tesoros de la Biblia (10 min) -->
     <section id="block-1">
-      <h2> Tesoros de la Biblia (10 min)</h2>
+      <h2>Tesoros de la Biblia (10 min)</h2>
       
       <!-- Sección 1: Orador (tiempo fijo: 600 seg) -->
       <div class="section" data-block-index="1" data-section-index="0" data-allocated="600">
         <div class="section-header">
-          <input type="text" class="section-title" value="Manténgase ">
+          <input type="text" class="section-title" value="Manténgase lejos de la inmoralidad sexual">
           
+          <label>Dirige la asignación:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
-           <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-1-0">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -107,13 +109,14 @@
       <div class="section with-comments" data-block-index="1" data-section-index="1" data-allocated="600">
         <div class="section-header">
           <input type="text" class="section-title" value="Proverbios 5 ">
+         
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
-          <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-1-1">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -145,15 +148,14 @@
       <div class="section" data-block-index="1" data-section-index="2" data-allocated="240">
         <div class="section-header">
           <input type="text" class="section-title" placeholder="Libro:" >
-       
+          <span class="allocated-fixed">240 seg</span>
           <label>Lector:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
-          <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-1-2">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -169,12 +171,11 @@
         <div class="section-header">
           <label class="section-title" style="font-weight:bold;">Consejo</label>
           <!-- Aquí no hay input para título, pero sí se muestran hora de inicio y fin -->
-           <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-1-3">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -196,13 +197,13 @@
           <input type="text" class="section-title" value="Asignación 1 Empiece conversaciones">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="240">
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="¿Estudiantes?">
-          <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-0">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -217,12 +218,11 @@
       <div class="section consejo" data-block-index="2" data-section-index="1" data-allocated="90">
         <div class="section-header">
           <label class="section-title" style="font-weight:bold;">Consejo </label>
-         <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-1">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -239,13 +239,13 @@
           <input type="text" class="section-title" value="Asignación 2 Haga revisitas">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="240">
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="¿Estudiantes?">
-         <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-2">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -260,12 +260,11 @@
       <div class="section consejo" data-block-index="2" data-section-index="3" data-allocated="90">
         <div class="section-header">
           <label class="section-title" style="font-weight:bold;">Consejo </label>
-        <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-3">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -282,14 +281,13 @@
           <input type="text" class="section-title" value="Asignación 3 Haga discípulos">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="300">
-          
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="¿Estudiante?">
-        <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-4">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -304,12 +302,11 @@
       <div class="section consejo" data-block-index="2" data-section-index="5" data-allocated="90">
         <div class="section-header">
           <label class="section-title" style="font-weight:bold;">Consejo </label>
-          <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-2-5">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -329,12 +326,11 @@
           <div class="section-header">
             <!-- Se muestra texto estático en lugar de input -->
           
-            <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
           <div class="timer-display" id="timer-block-2a-0">
             00:00 (<span class="time-diff">00:00</span>)
           </div>
@@ -357,13 +353,13 @@
           <input type="text" class="section-title" value="Haga todo lo posible por mantenerse casto durante el noviazgo">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="900">
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
-         <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-3-0">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -380,14 +376,13 @@
           <input type="text" class="section-title" placeholder="Título segunda parte">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="0">
-        
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
-           <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+          <label>Inicio:</label>
+          <input type="text" class="start-time" readonly>
+          <label>Fin:</label>
+          <input type="text" class="end-time" readonly>
+        </div>
         <div class="timer-display" id="timer-block-3-1">
           00:00 (<span class="time-diff">00:00</span>)
         </div>
@@ -405,7 +400,7 @@
           <input type="text" class="section-title" value="Testimonio completo cap. 24 párrs. 1-6">
           <label>Tiempo (seg):</label>
           <input type="number" class="allocated-input" value="1800">
-         
+          <label>Responsable:</label>
           <input type="text" class="responsible-input" placeholder="Nombre">
           <label>Inicio:</label>
           <input type="text" class="start-time" readonly>
@@ -429,17 +424,16 @@
       <div class="block-time-info">
         <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
           <div class="section-header">
-            
+            <input type="text" class="section-title" placeholder="Resumen y Anuncios">
             <!-- Se añade span para indicar responsable (por defecto, el presidente) -->
             <span class="council-responsible"></span>
-            
-            
-            <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+            <label>Tiempo (seg):</label>
+            <input type="number" class="allocated-input" value="180">
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
           <div class="timer-display" id="timer-block-4-0">
             00:00 (<span class="time-diff">00:00</span>)
           </div>
@@ -461,12 +455,11 @@
             <!-- Se muestra texto estático y se asigna al presidente mediante la clase council-responsible -->
            
             
-            <div class="time-container">
-    <label>Inicio:</label>
-    <input type="text" class="start-time" readonly>
-    <label>Fin:</label>
-    <input type="text" class="end-time" readonly>
-  </div>
+            <label>Inicio:</label>
+            <input type="text" class="start-time" readonly>
+            <label>Fin:</label>
+            <input type="text" class="end-time" readonly>
+          </div>
           <div class="timer-display" id="timer-block-5-0">
             00:00 (<span class="time-diff">00:00</span>)
           </div>
