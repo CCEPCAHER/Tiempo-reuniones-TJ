@@ -5,7 +5,7 @@ function formatTime(seconds) {
   return String(mins).padStart(2, "0") + ":" + secs;
 }
 
-// Funciones para habilitar/deshabilitar controles (se combinan ambas versiones)
+// Funciones para habilitar/deshabilitar controles
 function disableAllSectionControls() {
   document.querySelectorAll('.start-btn, .pause-btn, .reset-btn, .comment-start, .comment-end, .next-comment, .section-controls button').forEach(btn => {
     btn.disabled = true;
@@ -34,48 +34,39 @@ document.querySelectorAll('.section').forEach(section => {
   const pauseBtn = section.querySelector('.pause-btn');
   const resetBtn = section.querySelector('.reset-btn');
   
-  // Variables para llevar el tiempo acumulado y la marca de inicio
-  let currentTime = 0;
   let accumulatedTime = 0;
-  let startTimestamp = null;
+  let startTime = null;
   let intervalId = null;
   
   function updateDisplay() {
-    // Si el timer está corriendo, recalcular el tiempo usando la diferencia real
-    if (intervalId && startTimestamp !== null) {
-      currentTime = accumulatedTime + Math.floor((Date.now() - startTimestamp) / 1000);
+    let currentTime = accumulatedTime;
+    if (startTime !== null) {
+      currentTime += Math.floor((Date.now() - startTime) / 1000);
     }
     const diff = currentTime - allocatedTime;
     const sign = diff < 0 ? "-" : (diff > 0 ? "+" : "");
     timerDisplay.innerHTML = `<span class="time-main">${formatTime(currentTime)}</span> <span class="time-diff">(${sign}${formatTime(Math.abs(diff))})</span>`;
-    // Cambiar colores: verde si no se excede, rojo si se excede
-    if (diff <= 0) {
-      timerDisplay.classList.remove('red');
-      timerDisplay.classList.add('green');
-    } else {
-      timerDisplay.classList.remove('green');
-      timerDisplay.classList.add('red');
-    }
+    timerDisplay.classList.toggle('green', diff <= 0);
+    timerDisplay.classList.toggle('red', diff > 0);
   }
   
   function startTimer() {
-    // En algunos casos se evita iniciar el timer si no se ha iniciado la reunión
     if (!meetingStart && !section.classList.contains('consejo') && !section.classList.contains('with-comments')) return;
-    if (intervalId) return;
-    startTimestamp = Date.now();
-    intervalId = setInterval(updateDisplay, 1000);
+    if (startTime !== null) return;
+    startTime = Date.now();
+    intervalId = setInterval(updateDisplay, 250);
   }
   
   function pauseTimer() {
+    if (startTime !== null) {
+      accumulatedTime += Math.floor((Date.now() - startTime) / 1000);
+      startTime = null;
+    }
     if (intervalId) {
       clearInterval(intervalId);
       intervalId = null;
-      if (startTimestamp) {
-        accumulatedTime += Math.floor((Date.now() - startTimestamp) / 1000);
-      }
-      startTimestamp = null;
-      updateDisplay();
     }
+    updateDisplay();
   }
   
   function finalizeAssignment() {
@@ -95,21 +86,23 @@ document.querySelectorAll('.section').forEach(section => {
     allocatedInput.addEventListener('change', () => {
       allocatedTime = parseInt(allocatedInput.value, 10);
       if (!resetBtn.disabled) {
-        currentTime = 0;
         accumulatedTime = 0;
-        startTimestamp = null;
+        startTime = null;
         updateDisplay();
         updateSectionTimes();
       }
     });
   }
   
-  section.getElapsedTime = () => currentTime;
+  section.getElapsedTime = () => {
+    let elapsed = accumulatedTime;
+    if (startTime !== null) elapsed += Math.floor((Date.now() - startTime) / 1000);
+    return elapsed;
+  };
   section.getAllocatedTime = () => allocatedTime;
   
   updateDisplay();
 });
-
 /* FUNCIONES PARA AGRUPAR SECCIONES */
 function collectSections(element) {
   let sections = [];
@@ -148,74 +141,66 @@ document.querySelectorAll('.with-comments').forEach(section => {
   const commentCountSpan = section.querySelector('.comment-count');
   const commentList = section.querySelector('.comment-list');
   
-  // Variables para llevar el tiempo acumulado de comentarios
-  let commentTime = 0;
-  let commentAccumulatedTime = 0;
-  let commentStartTimestamp = null;
+  let commentAccumulated = 0;
+  let commentStartTime = null;
   let commentInterval = null;
   let commentCount = 0;
   let commentsData = [];
   
   function updateCommentDisplay() {
-    if (commentInterval && commentStartTimestamp !== null) {
-      commentTime = commentAccumulatedTime + Math.floor((Date.now() - commentStartTimestamp) / 1000);
+    let currentTime = commentAccumulated;
+    if (commentStartTime !== null) {
+      currentTime += Math.floor((Date.now() - commentStartTime) / 1000);
     }
-    commentTimerDisplay.textContent = formatTime(commentTime);
-    if (commentTime <= 30) {
-      commentTimerDisplay.classList.remove('red');
-      commentTimerDisplay.classList.add('green');
-    } else {
-      commentTimerDisplay.classList.remove('green');
-      commentTimerDisplay.classList.add('red');
-    }
+    commentTimerDisplay.textContent = formatTime(currentTime);
+    commentTimerDisplay.classList.toggle('green', currentTime <= 30);
+    commentTimerDisplay.classList.toggle('red', currentTime > 30);
   }
   
   commentStartBtn.addEventListener('click', () => {
     if (!commentInterval) {
-      commentStartTimestamp = Date.now();
-      commentInterval = setInterval(updateCommentDisplay, 1000);
+      commentStartTime = Date.now();
+      commentInterval = setInterval(updateCommentDisplay, 250);
     }
   });
   
-  function pauseCommentTimer() {
+  commentEndBtn.addEventListener('click', () => {
     if (commentInterval) {
       clearInterval(commentInterval);
       commentInterval = null;
-      if (commentStartTimestamp) {
-        commentAccumulatedTime += Math.floor((Date.now() - commentStartTimestamp) / 1000);
-      }
-      commentStartTimestamp = null;
-      updateCommentDisplay();
     }
-  }
-  
-  commentEndBtn.addEventListener('click', () => {
-    pauseCommentTimer();
+    if (commentStartTime !== null) {
+      commentAccumulated += Math.floor((Date.now() - commentStartTime) / 1000);
+      commentStartTime = null;
+    }
+    updateCommentDisplay();
   });
   
   nextCommentBtn.addEventListener('click', () => {
-    pauseCommentTimer();
+    if (commentInterval) {
+      clearInterval(commentInterval);
+      commentInterval = null;
+    }
+    if (commentStartTime !== null) {
+      commentAccumulated += Math.floor((Date.now() - commentStartTime) / 1000);
+      commentStartTime = null;
+    }
     let name = commentNameInput.value.trim() || "Sin nombre";
-    let duration = commentTime;
+    let duration = commentAccumulated;
     let exceeded = duration > 30;
     commentCount++;
     commentCountSpan.textContent = commentCount;
     let li = document.createElement('li');
     li.contentEditable = true;
-    if (exceeded) {
-      let diff = duration - 30;
-      li.textContent = `Comentario ${commentCount} - ${name}: ${formatTime(duration)} (Dif: +${formatTime(diff)})`;
-    } else {
-      li.textContent = `Comentario ${commentCount} - ${name}: ${formatTime(duration)}`;
-    }
+    li.textContent = exceeded 
+      ? `Comentario ${commentCount} - ${name}: ${formatTime(duration)} (Dif: +${formatTime(duration - 30)})`
+      : `Comentario ${commentCount} - ${name}: ${formatTime(duration)}`;
     li.style.backgroundColor = "#c8e6c9";
     commentList.appendChild(li);
     setTimeout(() => { li.style.backgroundColor = ""; }, 2000);
     commentsData.push({ name, duration, exceeded });
-    // Reiniciar el contador de comentarios
-    commentTime = 0;
-    commentAccumulatedTime = 0;
-    commentStartTimestamp = null;
+    commentAccumulated = 0;
+    commentStartTime = null;
     updateCommentDisplay();
     commentNameInput.value = "";
   });
@@ -278,7 +263,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
 });
 
 
-document.getElementById('generate-pdf').addEventListener('click', () => { 
+  document.getElementById('generate-pdf').addEventListener('click', () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -293,8 +278,8 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     return `${hrs}:${mins}`;
   }
 
-  // Encabezado general del PDF con fondo azul oscuro y fuente Helvetica
-  doc.setFillColor(10, 50, 100); // Azul oscuro
+  // Encabezado general del PDF
+  doc.setFillColor(180, 0, 100);
   doc.rect(0, 0, pageWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -302,17 +287,12 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   doc.text("Reporte Final de la Reunión", pageWidth / 2, 12, { align: "center" });
 
   y = 30;
-  doc.setTextColor(40, 40, 40); // Gris oscuro
+  doc.setTextColor(0, 0, 0);
   // Se obtiene el nombre del presidente (para introducción y resumen)
   const presidentName = document.getElementById("president-name").value || "N/A";
-  // Resaltar el nombre del participante: mayor tamaño y en negrita
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.text(`Presidente: ${presidentName}`, margin, y);
-  y += 12;
-  // Restaurar fuente normal para el resto del contenido
-  doc.setFont("helvetica", "normal");
   doc.setFontSize(14);
+  doc.text(`Presidente: ${presidentName}`, margin, y);
+  y += 10;
 
   // Mostrar hora de inicio
   const startTimeStr = meetingStart ? formatDateTime(meetingStart) : "No iniciado";
@@ -366,14 +346,14 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     allSectionGroups.push(group);
   });
 
-  // Paleta de colores pastel para encabezados de grupo (tonos suaves)
+  // Paleta de colores pastel para encabezados de grupo
   const blockColors = [
-    [220, 235, 245],
-    [235, 245, 220],
-    [245, 220, 235],
-    [240, 240, 245],
-    [220, 245, 245],
-    [245, 235, 220]
+    [255, 230, 230],
+    [230, 255, 230],
+    [230, 230, 255],
+    [255, 255, 230],
+    [230, 255, 255],
+    [255, 230, 255]
   ];
 
   // Función auxiliar: extraer el tiempo utilizado (se asume formato "mm:ss")
@@ -408,11 +388,11 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
   // Procesar cada grupo (cada h2 y sus secciones)
   allSectionGroups.forEach((group, groupIndex) => {
     if (y > 270) { doc.addPage(); y = 20; }
-    // Título del grupo (centrado con fondo en tono pastel)
+    // Título del grupo (centrado con fondo de color pastel)
     const color = blockColors[groupIndex % blockColors.length];
     doc.setFillColor(...color);
     doc.rect(margin, y, pageWidth - 2 * margin, 14, 'F');
-    doc.setTextColor(10, 50, 100); // Azul oscuro para contraste
+    doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text(group.title, pageWidth / 2, y + 10, { align: "center" });
@@ -432,16 +412,16 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         const elapsed = getElapsedTimeForSection(sec);
         const elapsedSec = parseTime(elapsed);
         const allocatedSec = parseInt(allocated, 10);
-        const timeColor = (elapsedSec <= allocatedSec) ? "#2E7D32" : "#C62828"; // Verde para OK, rojo para excedido
+        const timeColor = (elapsedSec <= allocatedSec) ? "#388e3c" : "#d32f2f";
         doc.setTextColor(timeColor);
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
-        doc.setTextColor(40, 40, 40);
+        doc.setTextColor(0, 0, 0);
         y += 10;
       }
       // Caso 2: Sección de Consejo
       else if (sec.classList.contains("consejo")) {
         doc.setFontSize(12);
-        doc.setTextColor(40, 40, 40);
+        doc.setTextColor("#000");
         doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
         y += 8;
         const allocated = sec.getAttribute("data-allocated") || "0";
@@ -465,22 +445,17 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
             : assignedElem.textContent.trim() || "Sin asignar";
         }
         if (assignedName) {
-          // Resaltar el nombre del responsable: mayor tamaño, negrita y color distintivo
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(16);
-          doc.setTextColor(50, 100, 200); // Azul distintivo
-          doc.text(`Asignado: ${assignedName}`, margin + 5, y);
-          y += rowHeight;
-          // Restaurar configuración
           doc.setFont("helvetica", "normal");
           doc.setFontSize(12);
-          doc.setTextColor(40, 40, 40);
+          doc.text(`Asignado: ${assignedName}`, margin + 5, y);
+          y += rowHeight;
         }
         // --- Extracción del título ---
         let titleText = "";
         const titleElem = sec.querySelector('.section-header .section-title');
         if (titleElem) {
           if (titleElem.tagName.toLowerCase() === "input") {
+            // Se usa el valor; si está vacío, se utiliza el placeholder
             titleText = titleElem.value.trim() || titleElem.placeholder || "Sin título";
           } else {
             titleText = titleElem.textContent.trim() || "Sin título";
@@ -488,31 +463,18 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         } else {
           titleText = "Sin título";
         }
-        // Se utiliza una fuente clara y de mayor tamaño para los títulos y tiempos
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
         doc.text(`Título: ${titleText}`, margin + 5, y);
         y += rowHeight;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(12);
         // ------------------------------
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(14);
           doc.text(`Tiempo asignado: ${allocated}`, margin + 5, y);
           y += rowHeight;
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
         }
         const elapsed = getElapsedTimeForSection(sec);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
         doc.text(`Tiempo usado: ${elapsed}`, margin + 5, y);
         y += rowHeight;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(12);
       }
       
       // Bloque extra para imprimir los comentarios del auditorio (para secciones with-comments)
@@ -521,26 +483,19 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
         if (commentList) {
           const comments = commentList.querySelectorAll('li');
           if (comments.length > 0) {
-            // Título de comentarios en mayor tamaño y color violeta
             doc.setFont("helvetica", "italic");
-            doc.setFontSize(16);
-            doc.setTextColor(150, 0, 150); // Violeta
+            doc.setFontSize(12);
             doc.text("Comentarios del Auditorio:", margin + 5, y);
             y += rowHeight;
-            // Cada comentario en tamaño un poco menor y color similar
             comments.forEach(li => {
               let commentText = li.textContent;
-              doc.setFont("helvetica", "italic");
-              doc.setFontSize(14);
-              doc.setTextColor(150, 0, 150);
               doc.text(commentText, margin + 10, y);
               y += rowHeight;
               if (y > 270) { doc.addPage(); y = 20; }
             });
-            // Restaurar configuración
+            // Restaurar fuente normal
             doc.setFont("helvetica", "normal");
             doc.setFontSize(12);
-            doc.setTextColor(40, 40, 40);
             y += rowHeight;
           }
         }
@@ -558,16 +513,16 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
     const estimatedEndTimeStr = formatDateTime(estimatedEndTime);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
-    doc.setTextColor(180, 30, 80); // Rojo elegante
+    doc.setTextColor(204, 0, 102); // Rojo vibrante
     doc.text(`Hora de fin estimada: ${estimatedEndTimeStr}`, pageWidth / 2, y, { align: "center" });
-    y += 30;
+    y += 30; // Aumentamos el espacio para separar ambas horas
   }
   // Hora de fin real (la hora actual)
   const realEndTime = new Date();
   const realEndTimeStr = formatDateTime(realEndTime);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
-  doc.setTextColor(0, 100, 0); // Verde profesional
+  doc.setTextColor(0, 153, 51); // Verde vibrante
   if (y > 250) {
     doc.addPage();
     y = 20;
@@ -577,7 +532,7 @@ document.getElementById('generate-pdf').addEventListener('click', () => {
 
   // Resumen final
   doc.setFontSize(14);
-  doc.setTextColor(40, 40, 40);
+  doc.setTextColor(0, 0, 0);
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += rowHeight;
   doc.setFontSize(12);
