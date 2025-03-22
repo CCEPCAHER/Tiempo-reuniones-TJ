@@ -263,13 +263,13 @@ document.querySelectorAll('.allocated-input').forEach(input => {
 });
 
 
-  document.getElementById('generate-pdf').addEventListener('click', () => {
+  document.getElementById('generate-pdf').addEventListener('click', () => { 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 12;
-  let y = 20;
-  const rowHeight = 8;
+  const margin = 15;
+  let y = 25;
+  const rowHeight = 12; // Espaciado vertical aumentado
 
   // Función para formatear la hora (formato HH:MM)
   function formatDateTime(date) {
@@ -278,29 +278,27 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     return `${hrs}:${mins}`;
   }
 
-  // Encabezado general del PDF
+  // --- CABECERA GENERAL ---
   doc.setFillColor(180, 0, 100);
-  doc.rect(0, 0, pageWidth, 15, 'F');
+  doc.rect(0, 0, pageWidth, 22, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("Reporte Final de la Reunión", pageWidth / 2, 12, { align: "center" });
-
-  y = 30;
+  doc.setFont("helvetica", "bold"); // Todo en negrita
+  doc.setFontSize(28);
+  doc.text("Reporte Final de la Reunión", pageWidth / 2, 16, { align: "center" });
+  
+  y = 35;
   doc.setTextColor(0, 0, 0);
-  // Se obtiene el nombre del presidente (para introducción y resumen)
+  doc.setFontSize(18);
+  // Nombre del presidente
   const presidentName = document.getElementById("president-name").value || "N/A";
-  doc.setFontSize(14);
   doc.text(`Presidente: ${presidentName}`, margin, y);
-  y += 10;
-
-  // Mostrar hora de inicio
+  y += 14;
+  // Hora de inicio
   const startTimeStr = meetingStart ? formatDateTime(meetingStart) : "No iniciado";
   doc.text(`Hora de inicio: ${startTimeStr}`, margin, y);
-  y += 10;
+  y += 16;
 
-  // ---------------------------
-  // INTEGRACIÓN DE LA IMAGEN (si existe)
+  // --- INTEGRACIÓN DE IMAGEN (si existe) ---
   const imageElement = document.getElementById("myImage");
   if (imageElement) {
     const canvas = document.createElement("canvas");
@@ -309,27 +307,22 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(imageElement, 0, 0);
     const imgData = canvas.toDataURL("image/png");
-
     const imgWidth = pageWidth - 2 * margin;
     const imgHeight = (imageElement.naturalHeight * imgWidth) / imageElement.naturalWidth;
     doc.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-    y += imgHeight + 10;
+    y += imgHeight + 12;
   }
-  // ---------------------------
-
-  // Función auxiliar para buscar recursivamente secciones dentro de un contenedor
+  
+  // --- AGRUPACIÓN DE SECCIONES ---
   function collectSections(element) {
     let sections = [];
     if (element.classList && element.classList.contains("section")) {
       sections.push(element);
     }
-    element.querySelectorAll(".section").forEach(sec => {
-      sections.push(sec);
-    });
+    element.querySelectorAll(".section").forEach(sec => sections.push(sec));
     return sections;
   }
 
-  // Agrupar todas las secciones según el h2 que las precede (buscando recursivamente)
   const allSectionGroups = [];
   document.querySelectorAll("h2").forEach(h2 => {
     const group = { title: h2.textContent.trim(), sections: [] };
@@ -345,8 +338,8 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     }
     allSectionGroups.push(group);
   });
-
-  // Paleta de colores pastel para encabezados de grupo
+  
+  // --- PALETA PARA ENCABEZADOS DE GRUPO ---
   const blockColors = [
     [255, 230, 230],
     [230, 255, 230],
@@ -356,59 +349,68 @@ document.querySelectorAll('.allocated-input').forEach(input => {
     [255, 230, 255]
   ];
 
-  // Función auxiliar: extraer el tiempo utilizado (se asume formato "mm:ss")
+  // Función auxiliar para extraer el tiempo utilizado (formato mm:ss)
   function getElapsedTimeForSection(sec) {
     const timerDisplay = sec.querySelector('.timer-display');
     if (timerDisplay) {
       const text = timerDisplay.textContent.trim();
       const match = text.match(/^(\d+:\d{2})/);
-      if (match) {
-        return match[1];
-      }
+      if (match) return match[1];
     }
     return "00:00";
   }
 
-  // Función auxiliar para formatear segundos a "m:ss"
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  // Función auxiliar para convertir un string "mm:ss" a segundos
   function parseTime(timeStr) {
     const parts = timeStr.split(":");
-    if (parts.length === 2) {
-      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-    }
+    if (parts.length === 2) return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
     return parseInt(timeStr, 10) || 0;
   }
-
-  // Procesar cada grupo (cada h2 y sus secciones)
+  
+  // --- PROCESAMIENTO DE GRUPOS Y SECCIONES ---
   allSectionGroups.forEach((group, groupIndex) => {
-    if (y > 270) { doc.addPage(); y = 20; }
-    // Título del grupo (centrado con fondo de color pastel)
+    if (y > 260) { doc.addPage(); y = margin; } // Umbral de salto de página ajustado
+    // Encabezado de grupo con fondo pastel
     const color = blockColors[groupIndex % blockColors.length];
     doc.setFillColor(...color);
-    doc.rect(margin, y, pageWidth - 2 * margin, 14, 'F');
+    doc.rect(margin, y, pageWidth - 2 * margin, 22, 'F');
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text(group.title, pageWidth / 2, y + 10, { align: "center" });
-    y += 18;
-
-    // Restaurar fuente normal para el contenido
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-
+    doc.setFontSize(24);
+    doc.text(group.title, pageWidth / 2, y + 16, { align: "center" });
+    y += 26;
+    
+    // Restaurar fuente para el contenido
+    doc.setFont("helvetica", "bold"); // Todo en negrita
+    doc.setFontSize(20);
+    
     group.sections.forEach((sec) => {
-      // Caso 1: Bloques de "Canción" u "Oración"
+      // Si estamos en "Seamos mejores maestros" y el apartado no es de consejo, aplicar color especial según asignación
+      if (group.title.toLowerCase().includes("seamos mejores maestros") && !sec.classList.contains("consejo")) {
+        const index = sec.getAttribute("data-section-index");
+        let assignmentColor;
+        if (index === "0") assignmentColor = "#FF0000";       // Asignación 1: Rojo
+        else if (index === "2") assignmentColor = "#0000FF";  // Asignación 2: Azul
+        else if (index === "4") assignmentColor = "#008000";  // Asignación 3: Verde
+        if (assignmentColor) {
+          doc.setTextColor(assignmentColor);
+        }
+      } else {
+        // Para los demás, se usa negro
+        doc.setTextColor(0, 0, 0);
+      }
+      
+      // Caso: Sección de Canción u Oración
       if (group.title.toLowerCase().includes("canción") || group.title.toLowerCase().includes("oración")) {
         const allocated = sec.getAttribute("data-allocated") || "0";
         const assigned = formatTime(parseInt(allocated, 10));
         doc.text(`Tiempo asignado: ${assigned}`, margin + 5, y);
-        y += 8;
+        y += 14;
         const elapsed = getElapsedTimeForSection(sec);
         const elapsedSec = parseTime(elapsed);
         const allocatedSec = parseInt(allocated, 10);
@@ -416,56 +418,47 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         doc.setTextColor(timeColor);
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
         doc.setTextColor(0, 0, 0);
-        y += 10;
+        y += 16;
       }
-      // Caso 2: Sección de Consejo
+      // Caso: Sección de Consejo
       else if (sec.classList.contains("consejo")) {
-        doc.setFontSize(12);
-        doc.setTextColor("#000");
         doc.text(`Consejo a cargo de ${presidentName}`, margin + 5, y);
-        y += 8;
+        y += 14;
         const allocated = sec.getAttribute("data-allocated") || "0";
         const allocatedSec = parseInt(allocated, 10);
         if (allocated) {
           const assigned = formatTime(allocatedSec);
           doc.text(`Tiempo asignado: ${assigned}`, margin + 5, y);
-          y += 8;
+          y += 14;
         }
         const elapsed = getElapsedTimeForSection(sec);
         doc.text(`Tiempo utilizado: ${elapsed}`, margin + 5, y);
-        y += 10;
+        y += 16;
       }
-      // Caso 3: Secciones normales (imprimir nombre asignado, título y tiempos)
+      // Caso: Secciones normales
       else {
         let assignedName = "";
         const assignedElem = sec.querySelector('.assigned-names') || sec.querySelector('.responsible-input');
         if (assignedElem) {
           assignedName = (assignedElem.tagName.toLowerCase() === "input")
-            ? assignedElem.value.trim() || "Sin asignar"
-            : assignedElem.textContent.trim() || "Sin asignar";
+            ? (assignedElem.value.trim() || "Sin asignar")
+            : (assignedElem.textContent.trim() || "Sin asignar");
         }
         if (assignedName) {
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
           doc.text(`Asignado: ${assignedName}`, margin + 5, y);
           y += rowHeight;
         }
-        // --- Extracción del título ---
         let titleText = "";
         const titleElem = sec.querySelector('.section-header .section-title');
         if (titleElem) {
-          if (titleElem.tagName.toLowerCase() === "input") {
-            // Se usa el valor; si está vacío, se utiliza el placeholder
-            titleText = titleElem.value.trim() || titleElem.placeholder || "Sin título";
-          } else {
-            titleText = titleElem.textContent.trim() || "Sin título";
-          }
+          titleText = (titleElem.tagName.toLowerCase() === "input")
+            ? (titleElem.value.trim() || titleElem.placeholder || "Sin título")
+            : (titleElem.textContent.trim() || "Sin título");
         } else {
           titleText = "Sin título";
         }
         doc.text(`Título: ${titleText}`, margin + 5, y);
         y += rowHeight;
-        // ------------------------------
         let allocated = sec.getAttribute("data-allocated");
         if (allocated) {
           allocated = formatTime(parseInt(allocated, 10));
@@ -477,67 +470,56 @@ document.querySelectorAll('.allocated-input').forEach(input => {
         y += rowHeight;
       }
       
-      // Bloque extra para imprimir los comentarios del auditorio (para secciones with-comments)
+      // Bloque extra: Comentarios del auditorio para secciones con comentarios
       if (sec.classList.contains("with-comments")) {
         const commentList = sec.querySelector('.comment-list');
         if (commentList) {
           const comments = commentList.querySelectorAll('li');
           if (comments.length > 0) {
-            doc.setFont("helvetica", "italic");
-            doc.setFontSize(12);
             doc.text("Comentarios del Auditorio:", margin + 5, y);
             y += rowHeight;
             comments.forEach(li => {
               let commentText = li.textContent;
               doc.text(commentText, margin + 10, y);
               y += rowHeight;
-              if (y > 270) { doc.addPage(); y = 20; }
+              if (y > 260) { doc.addPage(); y = margin; }
             });
-            // Restaurar fuente normal
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(12);
             y += rowHeight;
           }
         }
       }
       
-      if (y > 270) { doc.addPage(); y = 20; }
+      if (y > 260) { doc.addPage(); y = margin; }
     });
     y += 10;
   });
-
-  // --- Pie del reporte: imprimir ambas horas ---
-  // Hora de fin estimada (usando meetingStart y duración total)
+  
+  // --- PIE DEL REPORTE ---
+  const totalMeetingDuration = 105 * 60; // en segundos
   if (meetingStart) {
     const estimatedEndTime = new Date(meetingStart.getTime() + totalMeetingDuration * 1000);
     const estimatedEndTimeStr = formatDateTime(estimatedEndTime);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(28);
-    doc.setTextColor(204, 0, 102); // Rojo vibrante
+    doc.setFontSize(32);
+    doc.setTextColor(204, 0, 102);
     doc.text(`Hora de fin estimada: ${estimatedEndTimeStr}`, pageWidth / 2, y, { align: "center" });
-    y += 30; // Aumentamos el espacio para separar ambas horas
+    y += 44;
   }
-  // Hora de fin real (la hora actual)
   const realEndTime = new Date();
   const realEndTimeStr = formatDateTime(realEndTime);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(28);
-  doc.setTextColor(0, 153, 51); // Verde vibrante
-  if (y > 250) {
-    doc.addPage();
-    y = 20;
-  }
+  doc.setFontSize(32);
+  doc.setTextColor(0, 153, 51);
+  if (y > 240) { doc.addPage(); y = margin; }
   doc.text(`Hora de fin real: ${realEndTimeStr}`, pageWidth / 2, y, { align: "center" });
-  y += 30;
-
+  y += 44;
+  
   // Resumen final
-  doc.setFontSize(14);
+  doc.setFontSize(22);
   doc.setTextColor(0, 0, 0);
   doc.text(`Presidente: ${presidentName}`, margin, y);
   y += rowHeight;
-  doc.setFontSize(12);
+  doc.setFontSize(20);
   doc.text(`Reporte generado el: ${new Date().toLocaleDateString()}`, margin, y + 10);
-
+  
   doc.save("reporte_reunion_completo.pdf");
   disableAllSectionControls();
 });
