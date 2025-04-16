@@ -37,6 +37,7 @@ document.querySelectorAll('.section').forEach(section => {
   let accumulatedTime = 0;
   let startTime = null;
   let intervalId = null;
+  let finalizado = false; // Bandera para controlar estado finalizado/reanudable
   
   function updateDisplay() {
     let currentTime = accumulatedTime;
@@ -51,7 +52,9 @@ document.querySelectorAll('.section').forEach(section => {
   }
   
   function startTimer() {
+    // Para algunos tipos de secciones se requiere que la reunión haya iniciado
     if (!meetingStart && !section.classList.contains('consejo') && !section.classList.contains('with-comments')) return;
+    // Si ya está corriendo no hacemos nada
     if (startTime !== null) return;
     startTime = Date.now();
     intervalId = setInterval(updateDisplay, 250);
@@ -69,13 +72,23 @@ document.querySelectorAll('.section').forEach(section => {
     updateDisplay();
   }
   
+  // Función modificada para finalizar y luego reanudar el cronómetro
   function finalizeAssignment() {
-    pauseTimer();
-    updateDisplay();
-    startBtn.disabled = true;
-    pauseBtn.disabled = true;
-    resetBtn.disabled = true;
-    resetBtn.textContent = "Finalizado";
+    if (!finalizado) {
+      // Se finaliza: se pausa el cronómetro, se actualiza la interfaz y se cambia el botón
+      pauseTimer();
+      updateDisplay();
+      resetBtn.textContent = "Reanudar";
+      // Se deshabilita el botón de pausa para indicar que la cuenta está detenida
+      pauseBtn.disabled = true;
+      finalizado = true;
+    } else {
+      // Se reanuda: se vuelve a iniciar el cronómetro y se restauran los textos y botones
+      startTimer();
+      resetBtn.textContent = "Finalizar";
+      pauseBtn.disabled = false;
+      finalizado = false;
+    }
   }
   
   if (startBtn) startBtn.addEventListener('click', startTimer);
@@ -103,6 +116,7 @@ document.querySelectorAll('.section').forEach(section => {
   
   updateDisplay();
 });
+
 /* FUNCIONES PARA AGRUPAR SECCIONES */
 function collectSections(element) {
   let sections = [];
@@ -262,8 +276,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   input.addEventListener('change', updateSectionTimes);
 });
 
-
-  document.getElementById('generate-pdf').addEventListener('click', () => { 
+document.getElementById('generate-pdf').addEventListener('click', () => { 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -283,7 +296,7 @@ document.querySelectorAll('.allocated-input').forEach(input => {
   doc.setFillColor(180, 0, 100);
   doc.rect(0, 0, pageWidth, 22, 'F');
   doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold"); // Todo en negrita
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
   const headerTitle = doc.splitTextToSize("Reporte Final de la Reunión", pageWidth - 2 * margin);
   doc.text(headerTitle, pageWidth / 2, 16, { align: "center" });
