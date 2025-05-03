@@ -2,57 +2,15 @@
 html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  touch-action: manipulation; /* Prevents default browser behavior on touch */
 }
 
-/* Títulos con colores más llamativos */
-/* SECCIONES */
-section {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-left: 4px solid #ddd;
-  border-radius: 6px;
-  /* La siguiente línea se sobrescribirá para cada sección individualmente */
-  background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-section h2 {
-  font-size: 22px;
-  margin-bottom: 12px;
-  color: #222;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
-}
-
-/* COLORES INDIVIDUALIZADOS PARA 8 SECCIONES */
-section:nth-of-type(1) {
-  background-color: #ffe0b2;
-}
-section:nth-of-type(2) {
-  background-color: #dcedc8;
-}
-section:nth-of-type(3) {
-  background-color: #bbdefb;
-}
-section:nth-of-type(4) {
-  background-color: #f8bbd0;
-}
-section:nth-of-type(5) {
-  background-color: #c8e6c9;
-}
-section:nth-of-type(6) {
-  background-color: #d1c4e9;
-}
-section:nth-of-type(7) {
-  background-color: #ffccbc;
-}
-section:nth-of-type(8) {
-  background-color: #b3e5fc;
-}
-/* RESET */
+/* RESET MEJORADO */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
 }
 
 /* BODY */
@@ -60,300 +18,608 @@ body {
   font-family: "Arial", sans-serif;
   background: #f7f9fc;
   color: #333;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Improves font rendering */
+  padding-bottom: 60px; /* Added space for potential fixed elements or just bottom margin */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* CONTENEDOR PRINCIPAL */
 .container {
-  max-width: 700px;
+  max-width: 800px; /* Increased max-width slightly */
   margin: 20px auto;
-  padding: 20px;
+  padding: 25px;
   background: #fff;
-  border-left: 6px solid #333;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.1); /* Slightly stronger shadow */
 }
 
-/* TÍTULO */
+/* TÍTULO PRINCIPAL */
 h1 {
   text-align: center;
-  font-size: 28px;
-  color: #444;
-  margin-bottom: 20px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  font-size: 30px; /* Increased font size */
+  color: #2c3e50;
+  margin-bottom: 30px; /* Increased margin */
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ecf0f1;
+  font-weight: 700; /* Bolder font */
+}
+
+/* SUB-TÍTULOS DE BLOQUE */
+.meeting-block > h2 {
+    font-size: 22px; /* Adjusted size for block titles */
+    color: #34495e;
+    margin-bottom: 15px;
+    margin-top: 25px; /* Space before a new block */
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #bdc3c7; /* Dotted line for separation */
+}
+
+
+/* INPUTS GENERALES (Presidente, Título Sección, Asignado) */
+.president-section input,
+.section-header input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #bdc3c7; /* Softer border */
+  border-radius: 8px;
+  text-align: left;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 8px; /* Space below inputs in header */
+}
+
+.president-section input:focus,
+.section-header input[type="text"]:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+  outline: none;
 }
 
 /* PRESIDENTE */
 .president-section {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.president-section label {
-  margin-right: 10px;
-  font-weight: bold;
-}
-.president-section input {
-  width: 220px;
-  padding: 10px;
-  font-size: 15px;
-  border: 1px solid #bbb;
-  border-radius: 4px;
+  flex-direction: column;
+  gap: 8px; /* Reduced gap */
+  margin-bottom: 25px;
 }
 
-/* CONTROLES PRINCIPALES */
+.president-section label {
+    font-weight: bold;
+    color: #555;
+    font-size: 15px;
+}
+
+/* CONTROLES PRINCIPALES (Iniciar Reunión) */
 .meeting-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px; /* Increased margin */
+  align-items: center; /* Center items */
 }
+
 .main-control-btn {
-  flex: 1;
-  padding: 14px;
+  padding: 14px 28px; /* Adjusted padding */
   font-size: 18px;
-  background: linear-gradient(45deg, #b71c1c, #880e4f);
+  background: #c0392b; /* Darker red for main button */
   color: #fff;
   border: none;
-  border-radius: 4px;
-  margin-right: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); /* Adjusted shadow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  width: 100%; /* Full width on smaller screens */
+  max-width: 300px; /* Max width for larger screens */
 }
-.main-control-btn:hover {
-  opacity: 0.9;
+
+.main-control-btn:hover:not(:disabled) {
+  background: #e74c3c;
+  transform: translateY(-2px); /* Lift effect */
+  box-shadow: 0 6px 20px rgba(192, 57, 43, 0.5);
 }
+
+.main-control-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
+
 
 /* RELOJ FLOTANTE */
 #floating-clock {
   position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 999;
-  padding: 10px 14px;
-  background: #333;
-  color: #fff;
-  border-radius: 4px;
-  font-size: 18px;
-}
-
-/* SECCIONES */
-section {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-left: 4px solid #ddd;
-  border-radius: 6px;
-  background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-section h2 {
-  font-size: 22px;
-  margin-bottom: 12px;
-  color: #222;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
-}
-
-/* Tarjeta para secciones (estilo moderno) */
-.section {
-  background: linear-gradient(135deg, #ffffff, #f1f5f9);
-  border: 1px solid #e0e7ee;
+  top: 20px;
+  right: 20px;
+  background: rgba(52, 73, 94, 0.95); /* Darker, more opaque */
+  color: white;
+  padding: 10px 18px; /* Adjusted padding */
   border-radius: 8px;
-  margin-bottom: 16px;
-  padding: 12px;
+  font-size: 20px; /* Slightly larger font */
+  font-weight: bold;
+  backdrop-filter: blur(5px); /* Stronger blur effect */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  z-index: 1000; /* Ensure it's on top */
+  min-width: 120px; /* Give it a minimum width */
+  text-align: center;
+  justify-content: center;
 }
 
-/* ENCABEZADO DE SECCIÓN */
+#floating-clock .fas {
+    font-size: 18px;
+}
+
+/* SECCIONES INDIVIDUALES DENTRO DE UN BLOQUE */
+.section {
+  margin-bottom: 20px; /* Space between sections */
+  padding: 15px;
+  border-radius: 8px; /* Softer corners */
+  background: #ecf0f1; /* Light gray background for sections */
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); /* Subtle inner shadow */
+  position: relative;
+  border-left: 6px solid #3498db; /* Default section color */
+}
+
+/* Specific block colors via border-left on the .section */
+/* These override the default */
+.meeting-block[data-block-index="0"] .section { border-left-color: #f39c12; } /* Orange - Initial */
+.meeting-block[data-block-index="1"] .section { border-left-color: #1abc9c; } /* Teal - Intro */
+.meeting-block[data-block-index="2"] .section { border-left-color: #2980b9; } /* Dark Blue - Treasures */
+.meeting-block[data-block-index="3"] .section { border-left-color: #27ae60; } /* Green - Ministry */
+.meeting-block[data-block-index="4"] .section { border-left-color: #8e44ad; } /* Purple - Mid-Song */
+.meeting-block[data-block-index="5"] .section { border-left-color: #d35400; } /* Dark Orange - Christian Life */
+.meeting-block[data-block-index="6"] .section { border-left-color: #c0392b; } /* Dark Red - Summary */
+.meeting-block[data-block-index="7"] .section { border-left-color: #f1c40f; } /* Yellow - Final */
+
+
 .section-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px; /* Adjusted gap */
+  margin-bottom: 15px; /* Adjusted margin */
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dcdcdc; /* Separator line */
 }
+
 .section-header label {
-  font-weight: bold;
-  font-size: 15px;
-}
-.section-header input.section-title {
-  flex: 2;
-  padding: 8px;
-  font-size: 15px;
-  border: 1px solid #CCC;
-  border-radius: 4px;
-}
-.responsible-input {
-  flex: 3;
-  padding: 8px;
-  font-size: 15px;
-  border: 1px solid #CCC;
-  border-radius: 4px;
+    font-weight: bold;
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 0; /* Reset default label margin */
 }
 
-/* INPUT DE TIEMPO (SEGUNDOS) */
-.allocated-input {
-  width: 70px;
-  padding: 6px;
-  font-size: 15px;
-  text-align: center;
-  border: 1px solid #bbb;
-  border-radius: 4px;
+/* CONTROLES DE TIEMPO PROGRAMADO */
+.time-controls-row {
+  display: flex;
+  justify-content: space-around; /* Distribute space */
+  align-items: center;
+  gap: 10px; /* Space between elements in the row */
+  margin-top: 8px; /* Space above time row */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
-/* CAMPOS DE HORARIO */
-.start-time,
-.end-time {
-  width: 75px;
-  padding: 6px;
-  font-size: 15px;
-  border: 1px solid #bbb;
-  border-radius: 4px;
-  background: #f0f0f0;
+.time-controls-row span {
+  font-size: 14px;
   color: #555;
-  text-align: center;
+  white-space: nowrap; /* Prevent wrapping */
 }
 
-/* DISPLAY DEL TEMPORIZADOR */
+.time-controls-row input[type="text"],
+.time-controls-row input[type="number"] {
+  width: 55px; /* Slightly wider */
+  padding: 4px; /* Adjusted padding */
+  font-size: 14px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px; /* Smaller border-radius */
+  background: #fcfcfc; /* White background */
+  color: #2c3e50;
+  text-align: center;
+  font-weight: bold;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.time-controls-row input[type="number"] {
+    width: 45px; /* Slightly smaller width for number input */
+}
+
+.time-controls-row input[type="text"]:focus,
+.time-controls-row input[type="number"]:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+  outline: none;
+}
+
+
+/* TEMPORIZADOR PRINCIPAL DE SECCIÓN */
 .timer-display {
   text-align: center;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-.time-main {
-  font-size: 48px;
-  font-weight: bold;
-  display: inline-block;
-  margin-right: 8px;
-}
-.time-diff {
-  font-size: 16px;
-  display: inline-block;
-  width: 70px;
-  text-align: center;
-  margin-left: 8px;
+  font-size: 24px; /* Adjusted size */
+  font-weight: 700; /* Bolder */
+  color: #2c3e50;
+  margin: 15px 0; /* Adjusted margin */
+  padding: 12px; /* Adjusted padding */
+  background: #fff; /* White background */
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08); /* Subtle inner shadow */
+  display: flex; /* Use flex to align time and diff */
+  justify-content: center; /* Center content */
+  align-items: baseline; /* Align text baselines */
+  gap: 8px; /* Space between time and diff */
 }
 
-/* BOTONES DE SECCIÓN */
+.timer-display .time-main {
+    font-size: 1em; /* Main time takes primary size */
+}
+
+.timer-display .time-diff {
+    font-size: 0.8em; /* Difference is slightly smaller */
+    font-weight: 500;
+}
+
+
+.timer-display.green {
+  color: #27ae60; /* Green for on time or under */
+}
+
+.timer-display.red {
+  color: #e74c3c; /* Red for over time */
+}
+
+/* BOTONES DE CONTROL DE SECCIÓN */
 .section-controls {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.section-controls button {
-  flex: 1;
-  padding: 10px;
-  font-size: 15px;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.start-btn { background: #4caf50; }
-.pause-btn { background: #ff9800; }
-.reset-btn { background: #d32f2f; }
-.start-btn:hover, .pause-btn:hover, .reset-btn:hover {
-  opacity: 0.9;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  justify-content: center;
+  gap: 10px; /* Adjusted gap */
+  margin-top: 15px; /* Adjusted margin */
 }
 
-/* COMENTARIOS */
+.section-controls button {
+  flex: 1 1 120px; /* Allow buttons to grow/shrink, min width 120px */
+  padding: 10px 15px; /* Adjusted padding */
+  font-size: 15px; /* Adjusted font size */
+  border-radius: 6px; /* Softer corners */
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px; /* Space between icon and text */
+}
+
+.section-controls button i {
+    font-size: 1em; /* Icon size relative to text */
+}
+
+
+.start-btn {
+  background: #2ecc71; /* Emerald green */
+  box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
+}
+
+.start-btn:hover:not(:disabled) {
+    background: #27ae60;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+
+.pause-btn {
+  background: #f1c40f; /* Sunflower yellow */
+  box-shadow: 0 3px 10px rgba(241, 196, 15, 0.3);
+}
+
+.pause-btn:hover:not(:disabled) {
+    background: #f39c12;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+.reset-btn { /* Used for Finalize/Reset */
+  background: #e74c3c; /* Alizarin red */
+  box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+}
+
+.reset-btn:hover:not(:disabled) {
+    background: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 4p x 12px rgba(192, 57, 43, 0.4);
+}
+
+.section-controls button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+
+/* ESTILOS PARA COMENTARIOS */
 .comment-container {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed #aaa;
+  margin-top: 20px;
+  padding: 15px;
+  background: #fff9c4; /* Lighter yellow */
+  border-radius: 8px;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.1);
+  border-top: 1px solid #fbc02d; /* Yellow top border */
 }
+
 .comment-container h4 {
-  font-size: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 12px; /* Adjusted margin */
+  font-size: 18px;
+  color: #5a4500; /* Darker yellow-brown */
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #fbc02d;
+}
+
+.comment-input {
+  display: flex;
+  align-items: center; /* Align label and input */
+  gap: 10px; /* Space between label and input */
+  margin-bottom: 12px;
+  flex-wrap: wrap; /* Allow wrapping */
+}
+
+.comment-input label {
+  font-size: 14px;
   font-weight: bold;
+  color: #5a4500;
 }
-.comment-container .comment-input {
-  margin-bottom: 8px;
-}
-.comment-container input {
-  width: 100%;
+
+.comment-input input.comment-name {
+  flex-grow: 1; /* Allow input to take available space */
   padding: 8px;
-  font-size: 15px;
-  border: 1px solid #bbb;
-  border-radius: 4px;
+  font-size: 14px;
+  border: 1px solid #fbc02d; /* Yellow border */
+  border-radius: 5px;
+  text-align: left;
+  background: #fff;
 }
+
+.comment-timer {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  padding: 8px;
+  background: #fffde7; /* Very light yellow background */
+  border-radius: 5px;
+}
+
+.comment-timer.green { color: #388e3c; } /* Green for <= 30s */
+.comment-timer.red { color: #d32f2f; } /* Red for > 30s */
+
+
 .comment-controls {
   display: flex;
-  gap: 8px;
+  gap: 8px; /* Reduced gap */
+  justify-content: center;
+  flex-wrap: wrap; /* Allow wrapping */
 }
+
 .comment-controls button {
-  flex: 1;
-  padding: 10px;
-  font-size: 15px;
+  flex: 1 1 130px; /* Allow buttons to grow/shrink, min width 130px */
+  padding: 8px 12px;
+  font-size: 13px; /* Slightly smaller font */
   border: none;
-  border-radius: 4px;
-  color: #fff;
-  background: #0288d1;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background 0.2s;
+  background: #ffb300; /* Amber yellow */
+  color: #333; /* Darker text for contrast */
+  transition: background 0.2s, transform 0.1s;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
-.comment-controls button:hover {
-  background: #0277bd;
+
+.comment-controls button:hover:not(:disabled) {
+  background: #fbc02d; /* Darker amber */
+   transform: translateY(-1px);
 }
+
+.comment-controls button:disabled {
+    background: #ffe082; /* Lighter amber when disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 .comment-list {
   list-style: none;
-  margin-top: 8px;
-  padding: 0;
+  margin-top: 15px; /* Increased margin */
+  padding-top: 10px;
+  border-top: 1px dashed #fbc02d; /* Separator */
 }
+
 .comment-list li {
-  padding: 8px;
-  font-size: 15px;
-  background: #e3f2fd;
-  margin-bottom: 6px;
-  border-radius: 4px;
+    background-color: #fff; /* White background for list items */
+    padding: 8px 12px;
+    margin-bottom: 6px; /* Space between list items */
+    border-radius: 5px;
+    border: 1px solid #ffe082; /* Light yellow border */
+    font-size: 14px;
+    color: #333;
+    word-break: break-word; /* Prevent long words overflow */
 }
 
-/* SECCIONES DE CONSEJO */
-.consejo {
-  border: 2px dashed #1976d2;
-  background-color: #bbdefb;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 6px;
-}
-.consejo .section-header label.section-title {
-  color: #0d47a1;
-  font-size: 16px;
-}
 
-/* BOTÓN PARA GENERAR PDF */
+/* BOTÓN GENERAR PDF */
 .report {
-  text-align: center;
-  margin-top: 20px;
+    text-align: center; /* Center the button container */
+    margin-top: 40px; /* More space above the button */
 }
+
 #generate-pdf {
-  width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  background: #9c27b0;
+  background: #8e44ad; /* Wisteria purple */
   color: #fff;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  transition: opacity 0.2s;
-}
-#generate-pdf:hover {
-  opacity: 0.9;
+  transition: all 0.3s ease;
+  width: auto; /* Button takes width of content */
+  display: inline-flex; /* Use flex for icon and text */
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
 }
 
-/* ALERTAS */
-.red { color: #d32f2f; }
-.green { color: #388e3c; }
+#generate-pdf:hover:not(:disabled) {
+  background: #9b59b6; /* Lighter purple */
+  transform: translateY(-2px); /* Lift effect */
+  box-shadow: 0 6px 20px rgba(142, 68, 173, 0.5);
+}
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .container { padding: 10px; }
-  h1 { font-size: 24px; }
-  .time-main { font-size: 40px; }
-  #floating-clock { font-size: 16px; padding: 8px; }
-  .allocated-input { width: 60px; font-size: 13px; }
-  .section-controls button { font-size: 13px; padding: 8px; }
+#generate-pdf:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
+
+
+/* RESPONSIVE PARA MÓVILES VERTICALES */
+@media (max-width: 768px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+  }
+
+  .meeting-block > h2 {
+      font-size: 20px;
+      margin-top: 20px;
+  }
+
+  .section {
+      padding: 12px;
+      margin-bottom: 15px;
+  }
+
+  .section-header input[type="text"] {
+      font-size: 15px;
+      padding: 10px;
+  }
+
+  .time-controls-row {
+      flex-direction: row; /* Keep row direction for times */
+      flex-wrap: wrap; /* Allow wrapping */
+      align-items: center;
+      gap: 8px;
+      justify-content: space-around; /* Distribute space */
+  }
+
+  .time-controls-row > span {
+      flex-basis: 40px; /* Give label a fixed width */
+      text-align: right;
+  }
+
+   .time-controls-row input[type="text"],
+   .time-controls-row input[type="number"] {
+       flex-basis: 50px; /* Give input a fixed width */
+       flex-grow: 0; /* Prevent inputs from growing */
+       flex-shrink: 0; /* Prevent inputs from shrinking */
+       width: auto; /* Override default width */
+   }
+
+  .timer-display {
+      font-size: 20px; /* Smaller timer font */
+      padding: 10px;
+  }
+
+  .section-controls {
+      flex-direction: column; /* Stack buttons vertically */
+      gap: 8px;
+      margin-top: 15px;
+  }
+
+   .section-controls button {
+       flex: 1 1 100%; /* Each button takes full width */
+       padding: 10px;
+       font-size: 15px;
+   }
+
+
+  #floating-clock {
+    top: auto; /* Remove top positioning */
+    bottom: 10px; /* Position at the bottom */
+    left: 10px; /* Position from the left */
+    right: 10px; /* Position from the right */
+    width: auto; /* Allow width to adjust */
+    min-width: auto;
+    padding: 12px 15px; /* Adjusted padding */
+    font-size: 18px;
+    justify-content: center; /* Center content horizontally */
+  }
+
+  .comment-container {
+      padding: 12px;
+  }
+
+  .comment-container h4 {
+      font-size: 16px;
+  }
+
+  .comment-input {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+  }
+
+  .comment-input label {
+      font-size: 13px;
+  }
+
+  .comment-controls {
+      flex-direction: column;
+      gap: 6px;
+  }
+
+   .comment-controls button {
+       flex: 1 1 100%;
+       font-size: 13px;
+       padding: 10px;
+   }
+
+  .comment-list li {
+      font-size: 13px;
+      padding: 6px 10px;
+  }
+
+  #generate-pdf {
+      padding: 14px 28px;
+      font-size: 16px;
+  }
+
+}
+
+/* Adjust floating clock position if body padding-bottom is large */
+body:last-child > #floating-clock {
+  bottom: 10px;
+}
+
+/* Style for allocated input when disabled */
+.allocated-input:disabled {
+    background-color: #e0e0e0; /* Lighter gray */
+    cursor: not-allowed;
 }
