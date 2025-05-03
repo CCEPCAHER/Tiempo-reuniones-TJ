@@ -2,20 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" 
+  <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Programa de Reuniones - Testigos de Jehová</title>
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" 
+  <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Programa de Reuniones</h1>
+    <h1>Programa de Reuniones de la Semana</h1>
 
-    <!-- El campo de nombre ocupa el 100% -->
     <div class="president-section">
       <label for="president-name">Presidente de la reunión:</label>
       <input type="text" id="president-name" placeholder="Nombre del presidente">
@@ -30,385 +28,435 @@
       </div>
     </div>
 
-    <!-- Bloque de ejemplo con inputs de tiempo -->
-    <section id="block-0a">
+    <section class="meeting-block" data-block-index="0">
       <h2>Canción y oración (5 min)</h2>
-      <div class="section" data-block-index="0a" data-section-index="0" data-allocated="300">
+      <div class="section" data-block-index="0" data-section-index="0" data-allocated="300">
         <div class="section-header">
+          <input type="text" class="section-title" value="Canción Inicial y Oración">
+           <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <span>Inicio:</span>
-            <input type="text" class="start-time" value="7:35" readonly>
-            <span>Fin:</span>
-            <input type="text" class="end-time" value="7:39" readonly>
+            <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="5" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-0a-0">00:00</div>
-        <!-- Los botones se muestran en línea -->
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
     </section>
 
-    <!-- Bloque 0b -->
-    <section id="block-0b">
+    <section class="meeting-block" data-block-index="1">
       <h2>Palabras de introducción (1 min)</h2>
-      <div class="section" data-block-index="0b" data-section-index="0" data-allocated="60">
+      <div class="section" data-block-index="1" data-section-index="0" data-allocated="60">
         <div class="section-header">
+          <input type="text" class="section-title" value="Palabras de introducción">
+          <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <span>Inicio:</span>
-            <input type="text" class="start-time" value="7:35" readonly>
-            <span>Fin:</span>
-            <input type="text" class="end-time" value="7:39" readonly>
+            <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="1" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-0b-0">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
     </section>
 
-    <!-- Bloque 1: Ejemplo con campo de título que ocupa el 100% -->
-    <section id="block-1">
+    <section class="meeting-block" data-block-index="2">
       <h2>Tesoros de la Biblia (10 min)</h2>
-      <div class="section" data-block-index="1" data-section-index="0" data-allocated="600">
+      <div class="section with-comments" data-block-index="2" data-section-index="0" data-allocated="600">
         <div class="section-header">
-          <!-- Campo de título ocupando todo el ancho -->
           <input type="text" class="section-title" value="¿Qué nos hace verdaderamente ricos?">
+          <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <span>Inicio:</span>
-            <input type="text" class="start-time" value="7:35" readonly>
-            <span>Fin:</span>
-            <input type="text" class="end-time" value="7:39" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="10" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-1-0">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-    </section>
-
-    
-      <h2>Perlas escondidas (10 min)</h2>
-      <div class="section with-comments" data-block-index="1" data-section-index="1" data-allocated="600">
-        <div class="section-header">
-          <input type="text" class="section-title" value="Proverbios 10">
-          <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-block-1-1">00:00</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
         <div class="comment-container">
           <h4>Comentarios del Auditorio</h4>
           <div class="comment-input">
-            <label>Nombre:</label>
-            <input type="text" class="comment-name" placeholder="Nombre del comentador">
+            <label for="comment-name-2-0">Nombre:</label>
+            <input type="text" id="comment-name-2-0" class="comment-name" placeholder="Nombre del comentador">
           </div>
           <div class="timer-display comment-timer">00:00</div>
           <div class="comment-controls">
-            <button class="comment-start">Iniciar Comentario</button>
-            <button class="comment-end">Finalizar Comentario</button>
-            <button class="next-comment">Siguiente Comentario</button>
+            <button class="comment-start"><i class="fas fa-play"></i> Iniciar Comentario</button>
+            <button class="comment-end" disabled><i class="fas fa-pause"></i> Finalizar Comentario</button>
+            <button class="next-comment" disabled><i class="fas fa-forward"></i> Siguiente Comentario</button>
           </div>
           <p>Comentarios registrados: <span class="comment-count">0</span></p>
           <ul class="comment-list"></ul>
         </div>
       </div>
 
-      <h2>Lectura de la Biblia (4 min)</h2>
-      <div class="section" data-block-index="1" data-section-index="2" data-allocated="240">
-        <div class="section-header">
-          <input type="text" class="section-title" value="Proverbios 10:1-19">
+      <div class="section with-comments" data-block-index="2" data-section-index="1" data-allocated="600">
+        <h2>Perlas escondidas (10 min)</h2> <div class="section-header">
+          <input type="text" class="section-title" value="Proverbios 10">
+          <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="10" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-1-2">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+        <div class="comment-container">
+          <h4>Comentarios del Auditorio</h4>
+          <div class="comment-input">
+            <label for="comment-name-2-1">Nombre:</label>
+            <input type="text" id="comment-name-2-1" class="comment-name" placeholder="Nombre del comentador">
+          </div>
+          <div class="timer-display comment-timer">00:00</div>
+          <div class="comment-controls">
+            <button class="comment-start"><i class="fas fa-play"></i> Iniciar Comentario</button>
+            <button class="comment-end" disabled><i class="fas fa-pause"></i> Finalizar Comentario</button>
+            <button class="next-comment" disabled><i class="fas fa-forward"></i> Siguiente Comentario</button>
+          </div>
+          <p>Comentarios registrados: <span class="comment-count">0</span></p>
+          <ul class="comment-list"></ul>
         </div>
       </div>
 
-      <div class="section consejo" data-block-index="1" data-section-index="3" data-allocated="90">
-        <div class="section-header">
-          <label class="section-title">Consejo</label>
+      <div class="section" data-block-index="2" data-section-index="2" data-allocated="240">
+        <h2>Lectura de la Biblia (4 min)</h2> <div class="section-header">
+          <input type="text" class="section-title" value="Proverbios 10:1-19">
+          <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="4" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-1-3">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
     </section>
 
-    <!-- Bloque 2: Seamos mejores maestros -->
-    <section id="block-2">
+    <section class="meeting-block" data-block-index="3">
       <h2>Seamos mejores maestros (15 min)</h2>
-      
-      <div class="section" data-block-index="2" data-section-index="0" data-allocated="240">
+
+      <div class="section" data-block-index="3" data-section-index="0" data-allocated="240">
         <div class="section-header">
           <input type="text" class="section-title" value="Asignación 1 Empiece conversaciones">
+          <input type="text" class="assigned-person" placeholder="Hermano/a a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="4" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-0">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
 
-      <div class="section consejo" data-block-index="2" data-section-index="1" data-allocated="90">
+      <div class="section consejo" data-block-index="3" data-section-index="1" data-allocated="90">
         <div class="section-header">
           <label class="section-title">Consejo</label>
+          <input type="text" class="assigned-person" placeholder="A cargo de (Presidente)">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="1" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-1">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
 
-      <div class="section" data-block-index="2" data-section-index="2" data-allocated="180">
+      <div class="section" data-block-index="3" data-section-index="2" data-allocated="180">
         <div class="section-header">
-          <input type="text" class="section-title" value="Asignación 2 empiece conversaciones">
+          <input type="text" class="section-title" value="Asignación 2 Empiece conversaciones">
+          <input type="text" class="assigned-person" placeholder="Hermano/a a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="3" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-2">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
 
-      <div class="section consejo" data-block-index="2" data-section-index="3" data-allocated="90">
+       <div class="section consejo" data-block-index="3" data-section-index="3" data-allocated="90">
         <div class="section-header">
           <label class="section-title">Consejo</label>
+          <input type="text" class="assigned-person" placeholder="A cargo de (Presidente)">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="1" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-3">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
 
-      <div class="section" data-block-index="2" data-section-index="4" data-allocated="300">
+      <div class="section" data-block-index="3" data-section-index="4" data-allocated="300">
         <div class="section-header">
           <input type="text" class="section-title" value="Asignación 3 Explique sus creencias">
+          <input type="text" class="assigned-person" placeholder="Hermano/a a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="5" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-4">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
 
-      <div class="section consejo" data-block-index="2" data-section-index="5" data-allocated="90">
+       <div class="section consejo" data-block-index="3" data-section-index="5" data-allocated="90">
         <div class="section-header">
           <label class="section-title">Consejo</label>
+          <input type="text" class="assigned-person" placeholder="A cargo de (Presidente)">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="1" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-2-5">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
     </section>
 
-    <!-- Bloque 2a: Canción -->
-    <section id="block-2a">
+    <section class="meeting-block" data-block-index="4">
       <h2>Canción (3 min)</h2>
-      <div class="section" data-block-index="2a" data-section-index="0" data-allocated="180">
-        <div class="section-header">
-          <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-block-2a-0">00:00</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Bloque 3: Nuestra vida Cristiana -->
-    <section id="block-3">
-      <h2>Nuestra vida Cristiana (15 min)</h2>
-      
-      <div class="section" data-block-index="3" data-section-index="0" data-allocated="420">
-        <div class="section-header">
-          <input type="text" class="section-title" value="Necesidades de la congregación">
-          <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-block-3-0">00:00</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-
-      <div class="section" data-block-index="3" data-section-index="1" data-allocated="480">
-        <div class="section-header">
-          <input type="text" class="section-title" value="necesidades de congregación">
-          <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-block-3-1">00:00</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-
-      <h2>Estudio bíblico de congregación (30 min)</h2>
-      <div class="section" data-block-index="3" data-section-index="2" data-allocated="1800">
-        <div class="section-header">
-          <input type="text" class="section-title" value="Testimonio completo cap. 25 párrs. 8-13">
-          <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-block-3-2">00:00</div>
-        <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Bloque 4: Resumen y Anuncios -->
-    <section id="block-4">
-      <h2>Resumen y Anuncios (3 min)</h2>
       <div class="section" data-block-index="4" data-section-index="0" data-allocated="180">
         <div class="section-header">
-          <input type="text" class="section-title" placeholder="Resumen y Anuncios">
+           <input type="text" class="section-title" value="Canción Intermedia">
+           <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="3" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-4-0">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
         </div>
       </div>
     </section>
 
-    <!-- Bloque 5: Conclusión -->
-    <section id="block-5">
-      <h2>Canción y Oración (5 min)</h2>
-      <div class="section" data-block-index="5" data-section-index="0" data-allocated="300">
+    <section class="meeting-block" data-block-index="5">
+      <h2>Nuestra vida Cristiana (15 min)</h2>
+
+      <div class="section" data-block-index="5" data-section-index="0" data-allocated="420">
         <div class="section-header">
+          <input type="text" class="section-title" value="Necesidades de la congregación">
+          <input type="text" class="assigned-person" placeholder="Hermano a cargo">
           <div class="time-controls-row">
-            <label>Inicio:</label>
-            <input type="text" class="start-time" readonly>
-            <label>Fin:</label>
-            <input type="text" class="end-time" readonly>
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="7" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
           </div>
         </div>
-        <div class="timer-display" id="timer-block-5-0">00:00</div>
+        <div class="timer-display">00:00</div>
         <div class="section-controls">
-          <button class="start-btn">Iniciar</button>
-          <button class="pause-btn">Pausar</button>
-          <button class="reset-btn">Finalizar</button>
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+      </div>
+
+      <div class="section" data-block-index="5" data-section-index="1" data-allocated="480">
+        <div class="section-header">
+          <input type="text" class="section-title" value="Necesidades de congregación"> <input type="text" class="assigned-person" placeholder="Hermano a cargo">
+          <div class="time-controls-row">
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="8" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
+          </div>
+        </div>
+        <div class="timer-display">00:00</div>
+        <div class="section-controls">
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+      </div>
+
+      <h2>Estudio bíblico de congregación (30 min)</h2> <div class="section with-comments" data-block-index="5" data-section-index="2" data-allocated="1800">
+        <div class="section-header">
+          <input type="text" class="section-title" value="Testimonio completo cap. 25 párrs. 8-13">
+          <input type="text" class="assigned-person" placeholder="Director del estudio">
+          <div class="time-controls-row">
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="30" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
+          </div>
+        </div>
+        <div class="timer-display">00:00</div>
+        <div class="section-controls">
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+         <div class="comment-container">
+          <h4>Comentarios del Auditorio</h4>
+          <div class="comment-input">
+            <label for="comment-name-5-2">Nombre:</label>
+            <input type="text" id="comment-name-5-2" class="comment-name" placeholder="Nombre del comentador">
+          </div>
+          <div class="timer-display comment-timer">00:00</div>
+          <div class="comment-controls">
+            <button class="comment-start"><i class="fas fa-play"></i> Iniciar Comentario</button>
+            <button class="comment-end" disabled><i class="fas fa-pause"></i> Finalizar Comentario</button>
+            <button class="next-comment" disabled><i class="fas fa-forward"></i> Siguiente Comentario</button>
+          </div>
+          <p>Comentarios registrados: <span class="comment-count">0</span></p>
+          <ul class="comment-list"></ul>
         </div>
       </div>
     </section>
 
-    <!-- Botón para generar PDF -->
+    <section class="meeting-block" data-block-index="6">
+      <h2>Resumen y Anuncios (3 min)</h2>
+      <div class="section" data-block-index="6" data-section-index="0" data-allocated="180">
+        <div class="section-header">
+          <input type="text" class="section-title" placeholder="Resumen y Anuncios">
+          <input type="text" class="assigned-person" placeholder="A cargo de (Presidente)">
+          <div class="time-controls-row">
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="3" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
+          </div>
+        </div>
+        <div class="timer-display">00:00</div>
+        <div class="section-controls">
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="meeting-block" data-block-index="7">
+      <h2>Canción y Oración (5 min)</h2>
+      <div class="section" data-block-index="7" data-section-index="0" data-allocated="300">
+        <div class="section-header">
+           <input type="text" class="section-title" value="Canción Final y Oración">
+           <input type="text" class="assigned-person" placeholder="Hermano a cargo">
+          <div class="time-controls-row">
+             <span>Asignado (min):</span>
+            <input type="number" class="allocated-input" value="5" min="0">
+            <span>Inicio (prog):</span>
+            <input type="text" class="start-time" value="--:--" readonly>
+            <span>Fin (prog):</span>
+            <input type="text" class="end-time" value="--:--" readonly>
+          </div>
+        </div>
+        <div class="timer-display">00:00</div>
+        <div class="section-controls">
+          <button class="start-btn"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="pause-btn" disabled><i class="fas fa-pause"></i> Pausar</button>
+          <button class="reset-btn" disabled><i class="fas fa-check"></i> Finalizar</button>
+        </div>
+      </div>
+    </section>
+
     <div class="report">
-      <button id="generate-pdf">Generar Reporte en PDF</button>
+      <button id="generate-pdf"><i class="fas fa-file-pdf"></i> Generar Reporte en PDF</button>
     </div>
   </div>
 
