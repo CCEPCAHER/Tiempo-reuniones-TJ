@@ -6,10 +6,13 @@
  * @returns {string} Formatted time string (mm:ss).
  */
 function formatTime(totalSeconds) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
+  // Ensure totalSeconds is a non-negative number
+  const validSeconds = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(validSeconds / 60);
+  const seconds = Math.floor(validSeconds % 60);
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
+
 
 /**
  * Parses an "HH:MM" time string into a Date object for the current day.
@@ -19,9 +22,13 @@ function formatTime(totalSeconds) {
 function parseHM(timeString) {
     const parts = timeString.split(":");
     if (parts.length === 2) {
-        const now = new Date();
-        now.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
-        return now;
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        if (!isNaN(hours) && !isNaN(minutes) && hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+            const now = new Date();
+            now.setHours(hours, minutes, 0, 0);
+            return now;
+        }
     }
     return null;
 }
@@ -39,7 +46,8 @@ function formatHM(date) {
 }
 
 /**
- * Disables all section control buttons and allocated inputs.
+ * Disables all section *control buttons*.
+ * MODIFICACIÓN: Ya no deshabilita los allocated inputs aquí.
  */
 function disableAllSectionControls() {
   document.querySelectorAll('.section-controls button').forEach(btn => {
@@ -48,10 +56,7 @@ function disableAllSectionControls() {
   document.querySelectorAll('.comment-controls button').forEach(btn => {
       btn.disabled = true;
   });
-  // Disable allocated time inputs after meeting starts
-  document.querySelectorAll('.allocated-input').forEach(input => {
-      input.disabled = true;
-  });
+  // MODIFICACIÓN: Eliminado el código que deshabilitaba '.allocated-input' aquí.
 }
 
 /**
@@ -65,36 +70,36 @@ function enableSectionControls(sectionElement) {
     const key = `${blockIndex}-${sectionIndex}`;
     const state = meetingState[key];
 
+    // Si el estado no existe, salir (puede pasar durante la inicialización)
+    if (!state) return;
+
     const startBtn = sectionElement.querySelector('.start-btn');
     const pauseBtn = sectionElement.querySelector('.pause-btn');
     const resetBtn = sectionElement.querySelector('.reset-btn');
     const allocatedInput = sectionElement.querySelector('.allocated-input');
 
-
-    startBtn.disabled = state.status !== 'ready' && state.status !== 'paused';
-    pauseBtn.disabled = state.status !== 'running';
+    // Habilitar/deshabilitar botones de control de sección principal
+    if (startBtn) startBtn.disabled = state.status !== 'ready' && state.status !== 'paused';
+    if (pauseBtn) pauseBtn.disabled = state.status !== 'running';
     // Reset/Finalize button is enabled unless state is 'ready' (before first start)
-    resetBtn.disabled = state.status === 'ready';
+    if (resetBtn) resetBtn.disabled = state.status === 'ready';
 
     // Update the text of the reset/finalize/restart button
-    if (state.status === 'finished') {
-        resetBtn.textContent = 'Reiniciar';
-         // Make restart button visually distinct? Optional.
-         resetBtn.style.backgroundColor = '#3498db'; // Blue color for Restart
-         resetBtn.style.boxShadow = '0 3px 10px rgba(52, 152, 219, 0.3)';
-         resetBtn.innerHTML = '<i class="fas fa-redo"></i> Reiniciar'; // Add icon
-
-    } else {
-        resetBtn.textContent = 'Finalizar';
-         // Reset to default 'Finalizar' style
-         resetBtn.style.backgroundColor = ''; // Reset to CSS default
-         resetBtn.style.boxShadow = ''; // Reset to CSS default
-          resetBtn.innerHTML = '<i class="fas fa-check"></i> Finalizar'; // Add icon
-
+    if (resetBtn) {
+        if (state.status === 'finished') {
+            resetBtn.textContent = 'Reiniciar';
+            resetBtn.style.backgroundColor = '#3498db'; // Blue color for Restart
+            resetBtn.style.boxShadow = '0 3px 10px rgba(52, 152, 219, 0.3)';
+            resetBtn.innerHTML = '<i class="fas fa-redo"></i> Reiniciar'; // Add icon
+        } else {
+            resetBtn.textContent = 'Finalizar';
+            resetBtn.style.backgroundColor = ''; // Reset to CSS default
+            resetBtn.style.boxShadow = ''; // Reset to CSS default
+            resetBtn.innerHTML = '<i class="fas fa-check"></i> Finalizar'; // Add icon
+        }
     }
 
-
-    // Disable allocated input if meeting has started
+    // MODIFICACIÓN: Deshabilitar allocated input *solo si la reunión ha comenzado*.
     if (allocatedInput) {
         allocatedInput.disabled = !!meetingStart; // Convert meetingStart (Date object or null) to boolean
     }
@@ -109,24 +114,25 @@ function enableSectionControls(sectionElement) {
          // Comment controls are disabled if the main section timer is finished
          const commentControlsDisabled = state.status === 'finished';
 
-        commentStartBtn.disabled = commentControlsDisabled || (state.commentStatus !== 'ready' && state.commentStatus !== 'paused');
-        commentEndBtn.disabled = commentControlsDisabled || state.commentStatus !== 'running';
+        if (commentStartBtn) commentStartBtn.disabled = commentControlsDisabled || (state.commentStatus !== 'ready' && state.commentStatus !== 'paused');
+        if (commentEndBtn) commentEndBtn.disabled = commentControlsDisabled || state.commentStatus !== 'running';
         // Next comment is enabled if there's a running or paused comment AND the main section timer is not finished
-        nextCommentBtn.disabled = commentControlsDisabled || state.commentStatus === 'ready';
+        if (nextCommentBtn) nextCommentBtn.disabled = commentControlsDisabled || state.commentStatus === 'ready';
 
-
-         // Update comment timer color immediately based on state
-        const commentTime = state.commentStatus === 'running'
-            ? state.commentAccumulatedTime + Math.floor((Date.now() - state.commentStartTime) / 1000)
-            : state.commentAccumulatedTime;
-        commentTimerDisplay.classList.toggle('green', commentTime <= 30);
-        commentTimerDisplay.classList.toggle('red', commentTime > 30);
+        // Update comment timer color immediately based on state
+        if (commentTimerDisplay) {
+            const commentTime = state.commentStatus === 'running'
+                ? state.commentAccumulatedTime + Math.floor((Date.now() - (state.commentStartTime || Date.now())) / 1000)
+                : state.commentAccumulatedTime;
+            commentTimerDisplay.classList.toggle('green', commentTime <= 30);
+            commentTimerDisplay.classList.toggle('red', commentTime > 30);
+        }
     }
 }
 
 /**
  * Enables all section controls (usually after meeting starts).
- * Allocated inputs are disabled in this case.
+ * Allocated inputs are disabled in this case by enableSectionControls.
  */
 function enableAllSectionControls() {
     document.querySelectorAll('.section').forEach(enableSectionControls);
@@ -154,7 +160,7 @@ function initializeMeetingState() {
         // Read initial allocated time from the input field (in minutes), convert to seconds
         const initialAllocatedTime = allocatedInput
             ? parseInt(allocatedInput.value, 10) * 60 || 0
-            : parseInt(section.dataset.allocated, 10) || 0; // Fallback to data-allocated
+            : parseInt(section.dataset.allocated, 10) * 60 || 0; // Fallback to data-allocated (assuming minutes)
 
 
         const sectionTitleElement = section.querySelector('.section-title');
@@ -186,14 +192,29 @@ function initializeMeetingState() {
             commentAccumulatedTime: 0,
             commentStartTime: null, // Date.now() for comment timer
             commentInterval: null,
-            comments: [] // Array of { name: string, duration: number, exceeded: boolean }
+            comments: section.classList.contains('with-comments') ? [] : undefined // Initialize only if needed
         };
 
         // Update display initially
         updateSectionDisplay(key);
+         // Update comment display if applicable
+         if(meetingState[key].comments) {
+            updateCommentDisplay(key);
+        }
     });
     console.log("Meeting state initialized:", meetingState);
-    disableAllSectionControls(); // Controls and allocated inputs are disabled until meeting starts
+
+    // MODIFICACIÓN: Deshabilitar solo los botones al inicio, no los inputs de tiempo.
+    document.querySelectorAll('.section-controls button').forEach(btn => {
+        btn.disabled = true; // Disable section buttons
+    });
+    document.querySelectorAll('.comment-controls button').forEach(btn => {
+        btn.disabled = true; // Disable comment buttons
+    });
+    // Los botones de sección individuales se habilitarán/deshabilitarán correctamente
+    // por enableSectionControls basado en el estado 'ready'. El botón 'Finalizar/Reiniciar'
+    // estará deshabilitado inicialmente porque el estado es 'ready'.
+
     updateScheduledTimes(); // Calculate and display initial scheduled times
     updateFloatingClock(); // Initialize floating clock
 }
@@ -205,24 +226,33 @@ function initializeMeetingState() {
 function updateSectionDisplay(key) {
     const state = meetingState[key];
     const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
-    if (!sectionElement) return;
+    if (!sectionElement || !state) return; // Added check for state
 
     const timerDisplay = sectionElement.querySelector('.timer-display');
-    // If status is finished, display the final elapsed time
-    const elapsedTime = state.status === 'finished'
-        ? state.elapsedTime
-        : state.status === 'running'
-            ? state.elapsedTime + Math.floor((Date.now() - state.startTime) / 1000)
-            : state.elapsedTime;
+    if (!timerDisplay) return; // Added check for timerDisplay
+
+    // Calculate elapsed time based on state
+    let elapsedTime = state.elapsedTime;
+    if (state.status === 'running' && state.startTime) {
+        elapsedTime += Math.floor((Date.now() - state.startTime) / 1000);
+    }
 
     const diff = elapsedTime - state.allocatedTime;
     const sign = diff < 0 ? "-" : (diff > 0 ? "+" : "");
+    // Use Math.abs for the difference formatting
     timerDisplay.innerHTML = `<span class="time-main">${formatTime(elapsedTime)}</span> <span class="time-diff">(${sign}${formatTime(Math.abs(diff))})</span>`;
 
-    timerDisplay.classList.toggle('green', diff <= 0);
-    timerDisplay.classList.toggle('red', diff > 0);
+    // Ensure classes reflect current state accurately
+    timerDisplay.classList.remove('green', 'red'); // Clear previous classes
+    if (state.status === 'finished' || state.status === 'running' || state.status === 'paused') {
+         timerDisplay.classList.toggle('green', diff <= 0);
+         timerDisplay.classList.toggle('red', diff > 0);
+    } else {
+         // Style for 'ready' state (e.g., neutral)
+         // timerDisplay.classList.add('neutral'); // Example
+    }
 
-    // Update button states
+    // Update button states based on the current section state
     enableSectionControls(sectionElement);
 }
 
@@ -233,19 +263,25 @@ function updateSectionDisplay(key) {
 function updateCommentDisplay(key) {
      const state = meetingState[key];
      const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
-     if (!sectionElement || !sectionElement.classList.contains('with-comments')) return;
+     // Added checks for state and sectionElement
+     if (!state || !sectionElement || !sectionElement.classList.contains('with-comments')) return;
 
      const commentTimerDisplay = sectionElement.querySelector('.comment-timer');
-     const currentCommentTime = state.commentStatus === 'running'
-         ? state.commentAccumulatedTime + Math.floor((Date.now() - state.commentStartTime) / 1000)
-         : state.commentAccumulatedTime;
+     if (!commentTimerDisplay) return; // Added check
+
+     let currentCommentTime = state.commentAccumulatedTime;
+     if (state.commentStatus === 'running' && state.commentStartTime) {
+         currentCommentTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+     }
 
      commentTimerDisplay.textContent = formatTime(currentCommentTime);
-     commentTimerDisplay.classList.toggle('green', currentCommentTime <= 30);
-     commentTimerDisplay.classList.toggle('red', currentCommentTime > 30);
+     // Ensure classes reflect current state accurately
+     commentTimerDisplay.classList.remove('green', 'red'); // Clear previous classes
+     commentTimerDisplay.classList.toggle('green', currentCommentTime <= 30 && (state.commentStatus === 'running' || state.commentStatus === 'paused'));
+     commentTimerDisplay.classList.toggle('red', currentCommentTime > 30 && (state.commentStatus === 'running' || state.commentStatus === 'paused'));
 
-     // Update comment button states
-     enableSectionControls(sectionElement); // Re-enable/disable based on current state
+     // Update comment button states (part of enableSectionControls)
+     enableSectionControls(sectionElement);
 }
 
 
@@ -257,23 +293,24 @@ function updateCommentDisplay(key) {
  */
 function startSectionTimer(key) {
     const state = meetingState[key];
-    if (state.status === 'running' || state.status === 'finished') return;
+    if (!state || state.status === 'running' || state.status === 'finished') return;
 
     // Ensure meeting has started before starting individual timers
      if (!meetingStart) {
          console.warn("Meeting has not started yet. Cannot start individual section timer.");
-         // Optional: Show a user message
+         // Optional: Show a user message like alert("Debe iniciar la reunión primero.");
          return;
      }
 
     state.status = 'running';
-    state.startTime = Date.now();
+    state.startTime = Date.now(); // Set startTime when starting/resuming
     // Clear any existing interval before setting a new one
     if (state.timerInterval) clearInterval(state.timerInterval);
-    state.timerInterval = setInterval(() => updateSectionDisplay(key), 250); // Update more frequently for smoother timer
+    // Update frequently for smoothness
+    state.timerInterval = setInterval(() => updateSectionDisplay(key), 250);
 
-    updateSectionDisplay(key); // Initial display update
     console.log(`Timer started for ${key}`);
+    updateSectionDisplay(key); // Initial display update after state change
 }
 
 /**
@@ -282,16 +319,19 @@ function startSectionTimer(key) {
  */
 function pauseSectionTimer(key) {
     const state = meetingState[key];
-    if (state.status !== 'running') return;
+    if (!state || state.status !== 'running') return;
 
+    // Calculate elapsed time since last start/resume before changing state
+    if (state.startTime) {
+      state.elapsedTime += Math.floor((Date.now() - state.startTime) / 1000);
+    }
     state.status = 'paused';
-    state.elapsedTime += Math.floor((Date.now() - state.startTime) / 1000);
-    state.startTime = null;
+    state.startTime = null; // Clear startTime when paused
     if (state.timerInterval) clearInterval(state.timerInterval);
     state.timerInterval = null;
 
-    updateSectionDisplay(key); // Final update after pausing
-    console.log(`Timer paused for ${key}. Elapsed: ${formatTime(state.elapsedTime)}`);
+    console.log(`Timer paused for ${key}. Accumulated Elapsed: ${formatTime(state.elapsedTime)}`);
+    updateSectionDisplay(key); // Update display to show paused time
 }
 
 /**
@@ -300,30 +340,39 @@ function pauseSectionTimer(key) {
  */
 function finalizeSectionTimer(key) {
     const state = meetingState[key];
-    // Allow finalizing from 'running' or 'paused' states
-    if (state.status !== 'running' && state.status !== 'paused') return;
+    // Allow finalizing from 'running' or 'paused' states, but not 'ready' or 'finished'
+    if (!state || state.status === 'ready' || state.status === 'finished') return;
 
-    // Pause if running
-    if (state.status === 'running') {
+    // If running, calculate final elapsed time segment and add it
+    if (state.status === 'running' && state.startTime) {
         state.elapsedTime += Math.floor((Date.now() - state.startTime) / 1000);
     }
+    // If paused, elapsedTime is already up-to-date
+
     state.status = 'finished';
     state.startTime = null; // Ensure startTime is null
     if (state.timerInterval) clearInterval(state.timerInterval);
     state.timerInterval = null;
 
     // Pause and finalize any running comment timer in this section
-    if (state.commentStatus === 'running') {
-         state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+    if (state.comments && state.commentStatus === 'running') {
+         if(state.commentStartTime){
+             state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+         }
          state.commentStartTime = null;
          if (state.commentInterval) clearInterval(state.commentInterval);
          state.commentInterval = null;
-         state.commentStatus = 'paused'; // Comments don't have a 'finished' state in this logic, just stop timing
+         // Keep comment state as paused? Or maybe reset? Let's keep as paused.
+         state.commentStatus = 'paused';
          updateCommentDisplay(key);
+    } else if (state.comments && state.commentStatus === 'paused') {
+        // If comment was paused, it remains paused but controls get disabled by enableSectionControls
+        updateCommentDisplay(key); // Ensure display/controls update
     }
 
-    updateSectionDisplay(key); // Final display update
+
     console.log(`Timer finalized for ${key}. Final Elapsed: ${formatTime(state.elapsedTime)}`);
+    updateSectionDisplay(key); // Final display update for section timer and controls
 
     // Optional: Automatically start the next section's timer
     // findAndStartNextSection(key);
@@ -335,7 +384,7 @@ function finalizeSectionTimer(key) {
  */
 function restartSectionTimer(key) {
     const state = meetingState[key];
-    if (state.status !== 'finished') return; // Only restart if it's in 'finished' state
+    if (!state || state.status !== 'finished') return; // Only restart if it's in 'finished' state
 
     console.log(`Restarting timer for ${key}`);
 
@@ -353,19 +402,24 @@ function restartSectionTimer(key) {
          state.commentStartTime = null;
          if (state.commentInterval) clearInterval(state.commentInterval);
          state.commentInterval = null;
-         // Optionally clear comments list in DOM and state if restarting means a clean slate
-         // state.comments = [];
-         // const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
-         // if(sectionElement) sectionElement.querySelector('.comment-list').innerHTML = '';
-         // if(sectionElement) sectionElement.querySelector('.comment-count').textContent = '0';
+         // Clear comments list in DOM and state when restarting
+         state.comments = [];
+         const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
+         if(sectionElement) {
+             const commentList = sectionElement.querySelector('.comment-list');
+             const commentCount = sectionElement.querySelector('.comment-count');
+             if (commentList) commentList.innerHTML = '';
+             if (commentCount) commentCount.textContent = '0';
+             // Reset comment name input
+             const commentNameInput = sectionElement.querySelector('.comment-name');
+             if (commentNameInput) commentNameInput.value = '';
+
+         }
          updateCommentDisplay(key); // Update comment timer display (should show 00:00)
     }
 
     updateSectionDisplay(key); // Update main section display (should show 00:00)
-    // Re-enable buttons based on the new 'ready' state
-    const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
-     if(sectionElement) enableSectionControls(sectionElement);
-
+    // No need to explicitly call enableSectionControls here, updateSectionDisplay does it.
     console.log(`Timer for ${key} reset.`);
 }
 
@@ -391,23 +445,24 @@ function findAndStartNextSection(currentKey) {
  */
 function startCommentTimer(key) {
     const state = meetingState[key];
-    if (!state || !state.comments || state.commentStatus === 'running' || state.status === 'finished') return; // Prevent starting if main section is finished
+    // Prevent starting if main section is finished or comment timer is already running
+    if (!state || !state.comments || state.commentStatus === 'running' || state.status === 'finished') return;
 
-     // Ensure section timer is running or paused before starting comment timer?
-     // Let's assume comment timer can run independently once the section is active (not finished).
-     if (state.status === 'ready') {
-         console.warn("Main section timer is not active. Cannot start comment timer.");
+     // Allow starting comment timer if main section is running or paused
+     if (state.status !== 'running' && state.status !== 'paused') {
+         console.warn("Main section timer is not active (running or paused). Cannot start comment timer.");
+         // alert("Debe iniciar o pausar el temporizador principal de la sección primero."); // Optional user feedback
          return;
      }
 
 
     state.commentStatus = 'running';
-    state.commentStartTime = Date.now();
+    state.commentStartTime = Date.now(); // Set start time for the current run
     if (state.commentInterval) clearInterval(state.commentInterval); // Clear previous interval
-    state.commentInterval = setInterval(() => updateCommentDisplay(key), 250);
+    state.commentInterval = setInterval(() => updateCommentDisplay(key), 250); // Update frequently
 
-    updateCommentDisplay(key);
     console.log(`Comment timer started for ${key}`);
+    updateCommentDisplay(key); // Update display and controls
 }
 
 /**
@@ -418,14 +473,17 @@ function pauseCommentTimer(key) {
     const state = meetingState[key];
     if (!state || !state.comments || state.commentStatus !== 'running') return;
 
+    // Calculate elapsed time for the current run before changing state
+    if(state.commentStartTime) {
+        state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+    }
     state.commentStatus = 'paused';
-    state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
-    state.commentStartTime = null;
+    state.commentStartTime = null; // Clear start time when paused
     if (state.commentInterval) clearInterval(state.commentInterval);
     state.commentInterval = null;
 
-    updateCommentDisplay(key);
     console.log(`Comment timer paused for ${key}. Accumulated: ${formatTime(state.commentAccumulatedTime)}`);
+    updateCommentDisplay(key); // Update display and controls
 }
 
 /**
@@ -435,23 +493,30 @@ function pauseCommentTimer(key) {
 function finalizeAndResetCommentTimer(key) {
      const state = meetingState[key];
      const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
-     if (!state || !state.comments || !sectionElement || state.status === 'finished') return; // Prevent adding comments if main section is finished
+     // Prevent adding comments if main section is finished or if state/element missing
+     if (!state || !state.comments || !sectionElement || state.status === 'finished') return;
 
-     // Pause if running
+     // Pause if running and calculate time, otherwise use accumulated time
      if (state.commentStatus === 'running') {
-         state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+         if (state.commentStartTime) {
+            state.commentAccumulatedTime += Math.floor((Date.now() - state.commentStartTime) / 1000);
+         }
          state.commentStartTime = null;
          if (state.commentInterval) clearInterval(state.commentInterval);
          state.commentInterval = null;
-     } else if (state.commentStatus === 'ready') {
-          // If the timer is already ready (wasn't started), just add a blank comment
-          state.commentAccumulatedTime = 0;
      }
-
+     // If the timer was 'ready' (never started or already reset), accumulated time is 0
+     // If paused, accumulated time is already calculated.
 
      const commentNameInput = sectionElement.querySelector('.comment-name');
      const commentList = sectionElement.querySelector('.comment-list');
      const commentCountSpan = sectionElement.querySelector('.comment-count');
+
+     // Ensure elements exist before proceeding
+     if (!commentNameInput || !commentList || !commentCountSpan) {
+         console.error("Comment UI elements not found for section", key);
+         return;
+     }
 
      const name = commentNameInput.value.trim() || "Sin nombre";
      const duration = state.commentAccumulatedTime;
@@ -462,22 +527,27 @@ function finalizeAndResetCommentTimer(key) {
 
      // Update the comment list in the DOM
      const li = document.createElement('li');
-     li.textContent = `${state.comments.length}. ${name}: ${formatTime(duration)}${comment.exceeded ? ` (+${formatTime(duration - 30)})` : ''}`;
-     li.style.color = exceeded ? '#c0392b' : '#2c3e50'; // Red if exceeded, normal otherwise
+     const timeExceededStr = exceeded ? ` (+${formatTime(duration - 30)})` : '';
+     li.textContent = `${state.comments.length}. ${name}: ${formatTime(duration)}${timeExceededStr}`;
+     li.style.color = exceeded ? '#c0392b' : '#2c3e50'; // Red if exceeded, dark grey otherwise
      commentList.appendChild(li);
 
      // Update comment count display
      commentCountSpan.textContent = state.comments.length;
 
-     // Reset comment timer state
+     // Reset comment timer state for the next comment
      state.commentAccumulatedTime = 0;
      state.commentStatus = 'ready'; // Ready for the next comment
+     state.commentStartTime = null;
+     if (state.commentInterval) clearInterval(state.commentInterval); // Clear any lingering interval
+     state.commentInterval = null;
 
-     // Reset comment input and display
+     // Reset comment input and update display/controls
      commentNameInput.value = "";
-     updateCommentDisplay(key); // Should reset the comment timer display
+     updateCommentDisplay(key); // Should reset the comment timer display and update buttons
 
      console.log(`Comment finalized for ${key}:`, comment);
+     commentNameInput.focus(); // Focus input for next comment name
 }
 
 
@@ -492,21 +562,24 @@ function startMeeting() {
   meetingStart = new Date();
   console.log("Meeting started at:", meetingStart.toLocaleTimeString());
 
-  // Enable controls for all sections (allocated inputs will be disabled by enableSectionControls)
+  // Enable controls for all sections. This will now also disable allocated inputs
+  // because meetingStart is set.
   enableAllSectionControls();
 
   // Recalculate and display scheduled times based on the actual start time
-  updateScheduledTimes();
+  updateScheduledTimes(); // Call this *after* setting meetingStart
 
   // Start the global floating clock
+  if (globalTimerInterval) clearInterval(globalTimerInterval); // Clear existing interval if any
   globalTimerInterval = setInterval(updateFloatingClock, 1000);
   updateFloatingClock(); // Initial call to show time immediately
 
   // Disable the main start button
-  document.getElementById("meeting-start-button").disabled = true;
+  const startButton = document.getElementById("meeting-start-button");
+  if (startButton) startButton.disabled = true;
 
-   // Save initial allocated times to state before disabling inputs if needed (already done in initialize)
-   // Now disable inputs as meeting started
+   // MODIFICACIÓN: Explicitly disable allocated inputs again here just to be absolutely sure,
+   // although enableAllSectionControls -> enableSectionControls should handle it.
    document.querySelectorAll('.allocated-input').forEach(input => {
        input.disabled = true;
    });
@@ -518,361 +591,434 @@ function startMeeting() {
 function updateFloatingClock() {
   const clock = document.getElementById("global-timer");
   const clockContainer = document.getElementById("floating-clock");
+  if (!clock || !clockContainer) return; // Exit if elements not found
 
-  // Calculate total allocated time dynamically
+  // Calculate total allocated time dynamically from the current state
    let currentTotalAllocated = 0;
    for (const key in meetingState) {
-       if (meetingState.hasOwnProperty(key)) {
+       // Ensure the key belongs to meetingState and is not inherited
+       if (Object.hasOwnProperty.call(meetingState, key) && meetingState[key]) {
            currentTotalAllocated += meetingState[key].allocatedTime;
        }
    }
 
   if (!meetingStart) {
-    clock.textContent = formatTime(currentTotalAllocated); // Show sum of allocated time before start
-    clockContainer.style.backgroundColor = "gray";
+    // Before meeting starts, show the calculated total allocated time
+    clock.textContent = formatTime(currentTotalAllocated);
+    clockContainer.style.backgroundColor = "rgba(128, 128, 128, 0.95)"; // Grey
     return;
   }
 
+  // After meeting starts, calculate elapsed and remaining time
   const now = new Date();
-  const elapsed = Math.floor((now - meetingStart) / 1000);
+  const elapsed = Math.floor((now.getTime() - meetingStart.getTime()) / 1000);
   const remaining = currentTotalAllocated - elapsed; // Use dynamic total
 
-  clock.textContent = formatTime(Math.max(0, remaining)); // Don't show negative time
+  // Display remaining time, ensuring it doesn't go below zero visually
+  clock.textContent = formatTime(Math.max(0, remaining));
 
+  // Update background color based on remaining time
   if (remaining > 300) { // More than 5 minutes left
       clockContainer.style.backgroundColor = "rgba(39, 174, 96, 0.95)"; // Green
   } else if (remaining > 60) { // More than 1 minute left
       clockContainer.style.backgroundColor = "rgba(241, 196, 15, 0.95)"; // Yellow
   } else if (remaining > 0) { // Less than 1 minute left
        clockContainer.style.backgroundColor = "rgba(230, 126, 34, 0.95)"; // Orange
-  }
-  else { // Time is up or exceeded
+  } else { // Time is up or exceeded
     clockContainer.style.backgroundColor = "rgba(192, 57, 43, 0.95)"; // Red
+     // Optional: Blink effect when time is up
+     // clockContainer.classList.add('blinking');
   }
 }
 
 /**
  * Calculates and updates the scheduled start and end times for each section
- * based on the meeting start time and allocated times stored in meetingState.
+ * based on the meeting start time (or current time if not started)
+ * and allocated times stored in meetingState.
  */
 function updateScheduledTimes() {
-    // Use a dummy start time (like now) if the meeting hasn't officially started,
-    // so users see projected times based on current allocated durations.
-    const baseStartTime = meetingStart || new Date();
+    // Use the actual meeting start time if available, otherwise use 'now' for projection
+    const baseStartTime = meetingStart instanceof Date && !isNaN(meetingStart)
+                          ? meetingStart
+                          : new Date(); // Use current time for projection before start
 
     let currentTimeCalc = new Date(baseStartTime.getTime());
 
-     // Get all section keys in the order they appear in the DOM
-    const sectionKeysInOrder = Array.from(document.querySelectorAll(".section")).map(sectionElement => {
-        return `${sectionElement.dataset.blockIndex}-${sectionElement.dataset.sectionIndex}`;
-    });
+     // Get all section elements in the order they appear in the DOM
+    const sectionElements = document.querySelectorAll(".section");
 
-
-    sectionKeysInOrder.forEach(key => {
+    sectionElements.forEach(sectionElement => {
+        const blockIndex = sectionElement.dataset.blockIndex;
+        const sectionIndex = sectionElement.dataset.sectionIndex;
+        const key = `${blockIndex}-${sectionIndex}`;
         const state = meetingState[key];
-        const sectionElement = document.querySelector(`.section[data-block-index="${state.blockIndex}"][data-section-index="${state.sectionIndex}"]`);
 
-        if (!state || !sectionElement) return; // Should not happen if state is initialized correctly
+        // Ensure state exists for the section
+        if (!state) {
+            console.warn(`State not found for section key: ${key}`);
+            return;
+        }
 
-        const allocated = state.allocatedTime; // Use allocated time from state (user editable)
+        // Use allocatedTime from the state (in seconds), which reflects user input
+        const allocatedSeconds = state.allocatedTime;
 
-        state.scheduledStartTime = new Date(currentTimeCalc.getTime()); // Scheduled start is current calculated time
-        state.scheduledEndTime = new Date(currentTimeCalc.getTime() + allocated * 1000); // Scheduled end
+        // Calculate scheduled start and end times
+        state.scheduledStartTime = new Date(currentTimeCalc.getTime());
+        state.scheduledEndTime = new Date(currentTimeCalc.getTime() + allocatedSeconds * 1000);
 
+        // Update the input fields in the DOM
         const startField = sectionElement.querySelector(".start-time");
         const endField = sectionElement.querySelector(".end-time");
 
         if (startField) startField.value = formatHM(state.scheduledStartTime);
         if (endField) endField.value = formatHM(state.scheduledEndTime);
 
-        // Move the calculated time forward by the allocated time of this section
+        // Advance the calculation time for the next section
         currentTimeCalc = new Date(state.scheduledEndTime.getTime());
     });
-     console.log("Scheduled times updated.");
-     updateFloatingClock(); // Update global clock display as total allocated time might change
+     console.log("Scheduled times updated based on start:", formatHM(baseStartTime));
+     // Update the global clock display as total allocated time might change
+     // if the meeting hasn't started yet.
+     if (!meetingStart) {
+        updateFloatingClock();
+     }
 }
 
 
 // --- PDF GENERATION ---
 
+// Asegúrate de que la librería jsPDF esté cargada antes de este script.
+// Puedes incluirla mediante un tag <script> en tu HTML:
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 document.getElementById('generate-pdf').addEventListener('click', () => {
+    // Check if jsPDF is loaded
+    if (typeof window.jspdf === 'undefined') {
+        console.error("jsPDF library is not loaded.");
+        alert("Error: No se pudo cargar la librería para generar PDF.");
+        return;
+    }
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: 'p' });
+    const doc = new jsPDF({
+        orientation: 'p', // portrait
+        unit: 'mm',      // millimeters
+        format: 'a4'     // A4 size paper
+    });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
-    let y = 25;
-    const rowHeight = 8; // Base vertical spacing
+    const contentWidth = pageWidth - 2 * margin;
+    let y = 25; // Start position below header
+    const rowHeight = 7; // Base vertical spacing for lines
+    const titleFontSize = 16;
+    const headerFontSize = 12;
+    const textFontSize = 10;
+    const smallFontSize = 9;
+    const commentFontSize = 8;
 
-    // Set default font for the document
-    doc.setFont("helvetica");
+
+    // --- FONT SETUP ---
+    // jsPDF standard fonts: helvetica, times, courier (normal, bold, italic, bolditalic)
+    doc.setFont("helvetica", "normal"); // Set default font
 
 
     // --- HEADER ---
-    const headerColor = [180, 0, 100]; // A deep magenta/purple
+    const headerColor = [180, 0, 100]; // Deep magenta/purple
     doc.setFillColor(...headerColor);
-    doc.rect(0, 0, pageWidth, 25, 'F'); // Background rectangle
+    doc.rect(0, 0, pageWidth, 22, 'F'); // Background rectangle
     doc.setTextColor(255, 255, 255); // White text
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18); // Slightly smaller header title
+    doc.setFontSize(titleFontSize);
 
-    const headerTitle = "Reporte de la Reunión de la Semana";
-    doc.text(headerTitle, pageWidth / 2, 16, { align: "center" });
+    const headerTitle = "Reporte de la Reunión Semanal"; // Ajustado
+    doc.text(headerTitle, pageWidth / 2, 15, { align: "center" }); // Centered text
 
-    // Draw a line below the header
-     doc.setDrawColor(255, 255, 255); // White line color
-     doc.setLineWidth(0.5);
-     doc.line(margin, 22, pageWidth - margin, 22);
-
-
-    y = 35; // Start content below the header
+    y = 30; // Start content below the header
 
     // --- MEETING INFO ---
     doc.setTextColor(0, 0, 0); // Black text
-    doc.setFont("helvetica", "normal"); // Normal font for info
-    doc.setFontSize(10); // Smaller font for details
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(textFontSize);
 
-    const presidentName = document.getElementById("president-name").value.trim() || "N/A";
-    doc.text(`Presidente: ${presidentName}`, margin, y);
-    y += rowHeight;
+    const presidentInput = document.getElementById("president-name");
+    const presidentName = presidentInput ? presidentInput.value.trim() || "N/A" : "N/A";
+    doc.text(`Presidente:`, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(presidentName, margin + 25, y); // Indent value slightly
 
-    const startTimeStr = meetingStart ? formatHM(meetingStart) : "No iniciada";
-    doc.text(`Hora de inicio real: ${startTimeStr}`, margin, y);
-    y += rowHeight * 2; // Extra space after meeting info
+    const startTimeStr = meetingStart instanceof Date && !isNaN(meetingStart) ? formatHM(meetingStart) : "No iniciada";
+    doc.setFont("helvetica", "bold");
+    doc.text(`Hora de inicio real:`, margin, y + rowHeight);
+    doc.setFont("helvetica", "normal");
+    doc.text(startTimeStr, margin + 35, y + rowHeight);
+
+    y += rowHeight * 2.5; // Extra space after meeting info
 
     // --- SECTIONS REPORT ---
-    doc.setFontSize(10); // Font size for section details
-
     const blockColors = [
-        [255, 230, 230], // Light Red
-        [230, 255, 230], // Light Green
-        [230, 230, 255], // Light Blue
-        [255, 255, 230], // Light Yellow
-        [230, 255, 255], // Light Cyan
-        [255, 230, 255], // Light Magenta
-        [255, 240, 215], // Light Orange
-        [240, 225, 255]  // Light Purple
+        [245, 245, 245], // Light Grey (Subtle background)
+        [220, 235, 250], // Light Blue
+        [230, 250, 230], // Light Green
+        [255, 245, 220], // Light Yellow/Orange
+        [250, 230, 250], // Light Purple
+        [225, 245, 245]  // Light Cyan/Teal
     ];
 
-    // Iterate through the meeting blocks as structured in HTML
-    document.querySelectorAll(".meeting-block").forEach((blockElement, blockIndex) => {
-         const blockTitle = blockElement.querySelector('h2').textContent.trim();
+    let blockColorIndex = 0; // Cycle through colors for blocks
 
-         // Add page break if not enough space for block header + at least one section
-         if (y > pageHeight - margin - 30) {
+    // Get blocks and sections in DOM order
+    const blockElements = document.querySelectorAll(".meeting-block");
+
+    blockElements.forEach((blockElement) => {
+         const blockTitleElement = blockElement.querySelector('h2');
+         const blockTitle = blockTitleElement ? blockTitleElement.textContent.trim() : `Bloque ${blockColorIndex + 1}`;
+
+         // Check for page break before block header
+         if (y > pageHeight - margin - 20) { // Need space for header + some content
              doc.addPage();
-             y = margin;
+             y = margin; // Reset y for new page
          }
 
          // --- BLOCK HEADER ---
-         const color = blockColors[blockIndex % blockColors.length];
+         const color = blockColors[blockColorIndex % blockColors.length];
          doc.setFillColor(...color);
-         doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F'); // Background rectangle for block title
-         doc.setTextColor(0, 0, 0); // Black text for block title
+         doc.setDrawColor(150, 150, 150); // Grey border for block header
+         doc.setLineWidth(0.2);
+         doc.rect(margin, y, contentWidth, 9, 'FD'); // Filled and bordered rectangle
+         doc.setTextColor(0, 0, 0); // Black text
          doc.setFont("helvetica", "bold");
-         doc.setFontSize(12); // Font size for block titles
+         doc.setFontSize(headerFontSize);
+         doc.text(blockTitle, margin + 2, y + 6.5); // Position text inside the rect
 
-         doc.text(blockTitle, margin + 2, y + 7); // Block title text
-         y += 14; // Space after block header
+         y += 12; // Space after block header
+         blockColorIndex++; // Move to next color for next block
 
          // --- SECTIONS WITHIN BLOCK ---
-         doc.setFont("helvetica", "normal"); // Reset font for section details
-         doc.setFontSize(10); // Font size for section details
-
-         blockElement.querySelectorAll(".section").forEach(sectionElement => {
+         const sectionElements = blockElement.querySelectorAll(".section");
+         sectionElements.forEach(sectionElement => {
              const blockIdx = sectionElement.dataset.blockIndex;
              const sectionIdx = sectionElement.dataset.sectionIndex;
              const key = `${blockIdx}-${sectionIdx}`;
              const state = meetingState[key];
 
-             if (!state) return; // Skip if state is missing (shouldn't happen if initialized)
+             if (!state) return; // Skip if state is missing
 
-             // Add page break if not enough space for this section
-             if (y > pageHeight - margin - 25) { // Check space needed for section + potential comments
+             // Estimate height needed for this section (title, assigned, times, potentially comments)
+             let neededHeight = rowHeight * 3; // Base for title, assigned, time
+             if (state.comments && state.comments.length > 0) {
+                neededHeight += rowHeight; // For "Comentarios:" header
+                neededHeight += state.comments.length * rowHeight * 1.2; // Approximate height per comment
+             }
+
+             // Check for page break before drawing section
+             if (y + neededHeight > pageHeight - margin) {
                  doc.addPage();
-                 y = margin;
-                 // Redraw block header on new page for context
+                 y = margin; // Reset y
+                 // Optional: Redraw block header on new page for context
                  doc.setFillColor(...color);
-                 doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+                 doc.setDrawColor(150, 150, 150);
+                 doc.rect(margin, y, contentWidth, 9, 'FD');
                  doc.setTextColor(0, 0, 0);
                  doc.setFont("helvetica", "bold");
-                 doc.setFontSize(12);
-                 doc.text(blockTitle, margin + 2, y + 7);
-                 y += 14;
-                 doc.setFont("helvetica", "normal");
-                 doc.setFontSize(10);
+                 doc.setFontSize(headerFontSize);
+                 doc.text(blockTitle, margin + 2, y + 6.5);
+                 y += 12;
              }
 
              // Section Details
-             let sectionTitle = state.sectionTitle || "Sin título";
-             let assignedPerson = state.assignedPerson || "Sin asignar";
-             // Use allocatedTime from state (which comes from the input)
-             const allocatedTime = formatTime(state.allocatedTime);
-             const elapsedTime = formatTime(state.elapsedTime);
+             const sectionTitle = state.sectionTitle || "Sin título";
+             const assignedPerson = state.assignedPerson || "Sin asignar";
+             const allocatedTimeStr = formatTime(state.allocatedTime);
+             const elapsedTimeStr = formatTime(state.elapsedTime);
              const timeDifference = state.elapsedTime - state.allocatedTime;
+             const timeDiffStr = `${timeDifference >= 0 ? '+' : '-'}${formatTime(Math.abs(timeDifference))}`;
 
-             // Determine text color based on time difference
-             let timeColor = [0, 0, 0]; // Black by default
-             if (timeDifference > 0) { // Over time
-                 timeColor = [192, 57, 43]; // Dark Red
-             } else if (timeDifference <= 0) { // On time or under
-                 timeColor = [39, 174, 96]; // Green
-             }
-             doc.setTextColor(...timeColor);
-             doc.setFont("helvetica", "bold"); // Make time bold
+             // Determine text color for time based on difference
+             let timeColor = [0, 0, 0]; // Black default
+             if (timeDifference > 0) timeColor = [192, 57, 43]; // Dark Red (Over)
+             else if (state.status === 'finished') timeColor = [39, 174, 96]; // Green (Finished On/Under)
 
-             const timeInfo = `Usado: ${elapsedTime} (Asignado: ${allocatedTime} | Dif: ${timeDifference >= 0 ? '+' : '-'}${formatTime(Math.abs(timeDifference))})`;
+             const timeInfo = `Usado: ${elapsedTimeStr} (Asignado: ${allocatedTimeStr} | Dif: ${timeDiffStr})`;
+             const timeInfoWidth = doc.getTextWidth(timeInfo);
+
+             // Draw Title (potentially wrapped)
+             doc.setTextColor(0, 0, 0); // Black for title
+             doc.setFont("helvetica", "bold");
+             doc.setFontSize(textFontSize);
+             // Calculate available width for title (subtract time info width and some padding)
+             const availableTitleWidth = contentWidth - timeInfoWidth - 5;
+             const splitTitle = doc.splitTextToSize(sectionTitle, availableTitleWidth);
+             doc.text(splitTitle, margin, y);
+
+             // Draw Time Info (aligned right)
+             doc.setTextColor(...timeColor); // Set color for time
+             doc.setFont("helvetica", "normal"); // Normal weight for time details usually
+             doc.setFontSize(smallFontSize); // Smaller font for time details
              doc.text(timeInfo, pageWidth - margin, y, { align: "right" });
 
-             doc.setTextColor(0, 0, 0); // Reset color for title and assigned
-             doc.setFont("helvetica", "bold"); // Make title bold
-             const splitTitle = doc.splitTextToSize(sectionTitle, pageWidth - 2 * margin - doc.getTextWidth(timeInfo) - 5); // Limit title width
-             doc.text(splitTitle, margin + 2, y);
-             y += splitTitle.length * rowHeight; // Move y down based on wrapped title lines
+             // Move y down based on the number of lines the title took
+             y += splitTitle.length * (rowHeight * 0.8); // Adjust line height for title size
 
-             doc.setFont("helvetica", "normal"); // Normal font for assigned person
-             doc.text(`Asignado a: ${assignedPerson}`, margin + 2, y);
-             y += rowHeight + 2; // Space after section details
+             // Draw Assigned Person
+             doc.setTextColor(50, 50, 50); // Dark Grey for assigned person
+             doc.setFont("helvetica", "italic");
+             doc.setFontSize(smallFontSize);
+             doc.text(`Asignado a: ${assignedPerson}`, margin, y);
 
+             y += rowHeight * 1.5; // Space after section details before comments or next section
 
              // --- COMMENTS (if applicable) ---
              if (state.comments && state.comments.length > 0) {
-                  if (y > pageHeight - margin - (state.comments.length * rowHeight * 1.5) - 10) { // Check space for comments
-                      doc.addPage();
-                      y = margin;
-                      // Redraw block header and section details on new page for context if needed
-                      doc.setFillColor(...color);
-                      doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                      doc.setTextColor(0, 0, 0);
-                      doc.setFont("helvetica", "bold");
-                      doc.setFontSize(12);
-                      doc.text(blockTitle, margin + 2, y + 7);
-                      y += 14;
-                      doc.setFont("helvetica", "normal");
-                      doc.setFontSize(10);
-                      // Redraw section details on new page for context
-                      doc.setTextColor(...timeColor);
-                      doc.setFont("helvetica", "bold");
-                      doc.text(timeInfo, pageWidth - margin, y, { align: "right" });
-                      doc.setTextColor(0, 0, 0);
-                      doc.setFont("helvetica", "bold");
-                      doc.text(doc.splitTextToSize(sectionTitle, pageWidth - 2 * margin - doc.getTextWidth(timeInfo) - 5), margin + 2, y);
-                       y += splitTitle.length * rowHeight;
-                       doc.setFont("helvetica", "normal");
-                       doc.text(`Asignado a: ${assignedPerson}`, margin + 2, y);
-                       y += rowHeight + 2;
-                       doc.setFont("helvetica", "bold");
-                       doc.setFontSize(9);
-                       doc.text("Comentarios (cont.):", margin + 4, y);
-                       y += rowHeight;
-                       doc.setFont("helvetica", "normal");
-                       doc.setFontSize(9);
-                   }
+                 // Check for page break just before starting comments list
+                 if (y + (state.comments.length * rowHeight * 0.9) > pageHeight - margin) { // Estimate height
+                     doc.addPage();
+                     y = margin;
+                      // Re-draw block/section header if needed (optional, can get complex)
+                 }
 
+                 doc.setTextColor(0, 0, 0);
                  doc.setFont("helvetica", "bold");
-                 doc.setFontSize(9); // Smaller font for comment header
-                 doc.text("Comentarios:", margin + 4, y);
-                 y += rowHeight;
+                 doc.setFontSize(smallFontSize);
+                 doc.text("Comentarios:", margin + 2, y); // Indent comment block slightly
+                 y += rowHeight * 0.8;
 
                  doc.setFont("helvetica", "normal");
-                 doc.setFontSize(9); // Font size for comments
+                 doc.setFontSize(commentFontSize); // Even smaller for comments
 
                  state.comments.forEach((comment, commentIndex) => {
-                     const commentText = `${commentIndex + 1}. ${comment.name}: ${formatTime(comment.duration)}${comment.exceeded ? ` (+${formatTime(comment.duration - 30)})` : ''}`;
-                     const commentColor = comment.exceeded ? [192, 57, 43] : [0, 0, 0]; // Red if exceeded, Black otherwise
-                     doc.setTextColor(...commentColor);
+                     const timeExceededStr = comment.exceeded ? ` (+${formatTime(comment.duration - 30)})` : '';
+                     const commentText = `${commentIndex + 1}. ${comment.name}: ${formatTime(comment.duration)}${timeExceededStr}`;
+                     const commentColor = comment.exceeded ? [192, 57, 43] : [50, 50, 50]; // Red if exceeded, dark grey otherwise
 
-                     const splitComment = doc.splitTextToSize(commentText, pageWidth - 2 * margin - 8); // Indent comments
-                     doc.text(splitComment, margin + 6, y);
-                     y += splitComment.length * rowHeight * 1.2; // Slightly more space for comments
-
-                     if (y > pageHeight - margin) { // Check space after each comment
+                      // Check space before printing each comment
+                     if (y > pageHeight - margin - rowHeight) {
                          doc.addPage();
                          y = margin;
-                         // Redraw relevant headers/details if a page break happens mid-comments block
-                         doc.setFillColor(...color);
-                         doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
-                         doc.setTextColor(0, 0, 0);
-                         doc.setFont("helvetica", "bold");
-                         doc.setFontSize(12);
-                         doc.text(blockTitle, margin + 2, y + 7);
-                         y += 14;
-                         doc.setFont("helvetica", "normal");
-                         doc.setFontSize(10);
-                         doc.setTextColor(...timeColor);
-                         doc.setFont("helvetica", "bold");
-                         doc.text(timeInfo, pageWidth - margin, y, { align: "right" });
-                         doc.setTextColor(0, 0, 0);
-                         doc.setFont("helvetica", "bold");
-                         doc.text(doc.splitTextToSize(sectionTitle, pageWidth - 2 * margin - doc.getTextWidth(timeInfo) - 5), margin + 2, y);
-                         y += splitTitle.length * rowHeight;
-                         doc.setFont("helvetica", "normal");
-                         doc.text(`Asignado a: ${assignedPerson}`, margin + 2, y);
-                         y += rowHeight + 2;
-                         doc.setFont("helvetica", "bold");
-                         doc.setFontSize(9);
-                         doc.text("Comentarios (cont.):", margin + 4, y);
+                         // Optionally redraw headers if needed
+                         doc.setFont("helvetica", "italic");
+                         doc.setFontSize(commentFontSize);
+                         doc.text("(Comentarios continuación...)", margin, y);
                          y += rowHeight;
-                         doc.setFont("helvetica", "normal");
-                         doc.setFontSize(9);
+                         doc.setFont("helvetica", "normal"); // Reset font
+                         doc.setFontSize(commentFontSize);
                      }
+
+
+                     doc.setTextColor(...commentColor);
+                     const splitComment = doc.splitTextToSize(commentText, contentWidth - 6); // Allow wrapping
+                     doc.text(splitComment, margin + 4, y); // Indent comment text
+                     y += splitComment.length * (rowHeight * 0.7); // Adjust based on wrapped lines
+
                  });
                  doc.setTextColor(0, 0, 0); // Reset color
-                 y += rowHeight; // Extra space after comments block
+                 y += rowHeight * 0.5; // Extra space after comments block
              }
 
-             y += 5; // Small space after each section details or comments
+             y += 5; // Small gap between sections
 
          });
-         y += 10; // Space after each block
+         y += 8; // Space after each block
     });
 
     // --- FOOTER ---
-    if (y > pageHeight - margin - 30) { doc.addPage(); y = margin; } // New page if footer doesn't fit
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(smallFontSize - 1);
+        doc.setTextColor(150, 150, 150); // Light grey footer text
 
-    doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(`Reporte generado el: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, margin, pageHeight - 10);
-    doc.text(`Presidente: ${presidentName}`, pageWidth - margin, pageHeight - 10, { align: "right" });
+        const footerTextLeft = `Reporte generado: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+        doc.text(footerTextLeft, margin, pageHeight - 10);
 
+        const footerTextRight = `Página ${i} de ${pageCount}`;
+        doc.text(footerTextRight, pageWidth - margin, pageHeight - 10, { align: "right" });
+    }
 
-    doc.save("reporte_reunion.pdf");
+    // --- SAVE ---
+    doc.save(`reporte_reunion_${new Date().toISOString().slice(0,10)}.pdf`);
 });
 
 
 // --- EVENT LISTENERS ---
 
-document.getElementById("meeting-start-button").addEventListener("click", startMeeting);
+// Listener for the main start button
+const mainStartButton = document.getElementById("meeting-start-button");
+if (mainStartButton) {
+    mainStartButton.addEventListener("click", startMeeting);
+} else {
+    console.error("Meeting start button not found!");
+}
 
-document.getElementById("president-name").addEventListener("input", function() {
-    // Optional: Update assigned person fields for "Consejo" sections
-    const presidentName = this.value.trim();
-    document.querySelectorAll('.section.consejo .assigned-person').forEach(input => {
-        // Only update if the input is empty and it has the specific placeholder
-        if (!input.value.trim() && input.placeholder === "A cargo de (Presidente)") {
-             input.value = presidentName;
-        }
-        // Always ensure the placeholder is correct if the input becomes empty later
-        if (input.value.trim() === "") {
-             input.placeholder = "A cargo de (Presidente)";
-        } else {
-             input.placeholder = ""; // Clear placeholder if something is typed
-        }
-         // Update state for the president section's assigned person
-         const sectionElement = input.closest('.section');
-          if (sectionElement) {
-            const blockIndex = sectionElement.dataset.blockIndex;
-            const sectionIndex = sectionElement.dataset.sectionIndex;
-            const key = `${blockIndex}-${sectionIndex}`;
-             if (meetingState[key]) {
-                 meetingState[key].assignedPerson = input.value.trim() || input.placeholder.trim();
+// Listener for president name input
+const presidentNameInput = document.getElementById("president-name");
+if (presidentNameInput) {
+    presidentNameInput.addEventListener("input", function() {
+        const presidentName = this.value.trim();
+        document.querySelectorAll('.section.consejo .assigned-person').forEach(input => {
+            const originalPlaceholder = "A cargo de (Presidente)"; // Store original placeholder text
+             // Update value only if it was previously empty or matched the placeholder logic
+            if (!input.dataset.userInput) { // Check if user hasn't typed anything specific yet
+                 input.value = presidentName;
+            }
+            // Update placeholder based on whether there's a value
+            input.placeholder = input.value.trim() === "" ? originalPlaceholder : "";
+
+            // Update state for the relevant section
+             const sectionElement = input.closest('.section');
+             if (sectionElement) {
+                const blockIndex = sectionElement.dataset.blockIndex;
+                const sectionIndex = sectionElement.dataset.sectionIndex;
+                const key = `${blockIndex}-${sectionIndex}`;
+                 if (meetingState[key]) {
+                    // Use the actual input value if present, otherwise the calculated president name (if input is still linked) or default placeholder
+                    let assignedValue = input.value.trim();
+                    if (!assignedValue && !input.dataset.userInput) {
+                        assignedValue = presidentName || originalPlaceholder; // Use president name if available
+                    } else if (!assignedValue && input.dataset.userInput){
+                        assignedValue = originalPlaceholder; // Fallback if user cleared their own input
+                    }
+                    meetingState[key].assignedPerson = assignedValue;
+                 }
              }
-          }
+        });
     });
-});
+     // Add a flag when user types into an assigned person field linked to the president
+     document.querySelectorAll('.section.consejo .assigned-person').forEach(input => {
+         input.addEventListener('input', function() {
+             if(this.value.trim() !== "") {
+                 this.dataset.userInput = "true"; // Mark that user has provided input
+             } else {
+                 // If user clears the input, potentially revert to president name or placeholder
+                 delete this.dataset.userInput;
+                  // Trigger the president name update logic again if president name exists
+                 const presidentValue = presidentNameInput ? presidentNameInput.value.trim() : "";
+                 if (presidentValue){
+                     this.value = presidentValue;
+                     this.placeholder = "";
+                 } else {
+                     this.placeholder = "A cargo de (Presidente)";
+                 }
+                 // Update state immediately after reverting
+                 const sectionElement = this.closest('.section');
+                 if (sectionElement) {
+                    const blockIndex = sectionElement.dataset.blockIndex;
+                    const sectionIndex = sectionElement.dataset.sectionIndex;
+                    const key = `${blockIndex}-${sectionIndex}`;
+                     if (meetingState[key]) {
+                        meetingState[key].assignedPerson = this.value.trim() || this.placeholder.trim();
+                     }
+                 }
+             }
+         });
+     });
+
+} else {
+    console.warn("President name input field not found.");
+}
 
 
+// Listeners for individual sections
 document.querySelectorAll('.section').forEach(section => {
     const blockIndex = section.dataset.blockIndex;
     const sectionIndex = section.dataset.sectionIndex;
@@ -881,7 +1027,7 @@ document.querySelectorAll('.section').forEach(section => {
     // Add event listeners to section control buttons
     const startBtn = section.querySelector('.start-btn');
     const pauseBtn = section.querySelector('.pause-btn');
-    const resetBtn = section.querySelector('.reset-btn');
+    const resetBtn = section.querySelector('.reset-btn'); // This is Finalizar/Reiniciar
 
     if (startBtn) startBtn.addEventListener('click', () => startSectionTimer(key));
     if (pauseBtn) pauseBtn.addEventListener('click', () => pauseSectionTimer(key));
@@ -892,9 +1038,9 @@ document.querySelectorAll('.section').forEach(section => {
             if (!state) return;
 
             if (state.status === 'finished') {
-                restartSectionTimer(key); // If finished, restart
+                restartSectionTimer(key); // If finished, the button action is to restart
             } else {
-                finalizeSectionTimer(key); // Otherwise (running or paused), finalize
+                finalizeSectionTimer(key); // Otherwise (ready, running or paused), the button action is to finalize
             }
         });
     }
@@ -903,75 +1049,88 @@ document.querySelectorAll('.section').forEach(section => {
      // Add event listeners to comment controls if they exist
     if (section.classList.contains('with-comments')) {
          const commentStartBtn = section.querySelector('.comment-start');
-         const commentEndBtn = section.querySelector('.comment-end');
-         const nextCommentBtn = section.querySelector('.next-comment');
+         const commentEndBtn = section.querySelector('.comment-end'); // This now acts as PAUSE
+         const nextCommentBtn = section.querySelector('.next-comment'); // This finalizes the current one
 
          if (commentStartBtn) commentStartBtn.addEventListener('click', () => startCommentTimer(key));
-         if (commentEndBtn) commentEndBtn.addEventListener('click', () => pauseCommentTimer(key)); // Pause when 'Finalizar Comentario' is clicked (pre-Next)
-         if (nextCommentBtn) nextCommentBtn.addEventListener('click', () => finalizeAndResetCommentTimer(key)); // Finalize and move to next
+         if (commentEndBtn) commentEndBtn.addEventListener('click', () => pauseCommentTimer(key)); // Use pause for "Finalizar Comentario" (before next)
+         if (nextCommentBtn) nextCommentBtn.addEventListener('click', () => finalizeAndResetCommentTimer(key)); // Finalize current and reset for next
     }
 
     // Add event listener for allocated time input
     const allocatedInput = section.querySelector('.allocated-input');
     if (allocatedInput) {
         allocatedInput.addEventListener('change', (event) => {
+             // MODIFICACIÓN: Check if the input is disabled before processing
+             if (event.target.disabled) {
+                 console.log("Allocated time input is disabled (meeting likely started). Change ignored.");
+                 // Optionally revert the value if needed, though disabled should prevent changes
+                 // event.target.value = (meetingState[key] ? meetingState[key].allocatedTime / 60 : 0);
+                 return;
+             }
+
             let minutes = parseInt(event.target.value, 10);
             if (isNaN(minutes) || minutes < 0) {
-                minutes = 0; // Default to 0 if input is invalid
+                minutes = 0; // Default to 0 if input is invalid or negative
                 event.target.value = 0; // Fix the input display
             }
             const allocatedSeconds = minutes * 60;
             if (meetingState[key]) {
                 meetingState[key].allocatedTime = allocatedSeconds; // Update state with seconds
-                // Recalculate and update scheduled times for all sections after this one
+                // Recalculate and update scheduled times for all subsequent sections
                 updateScheduledTimes();
                  // Update the timer display immediately to show difference vs new allocated time
                 updateSectionDisplay(key);
+            } else {
+                console.warn(`State not found for key ${key} during allocated time change.`);
             }
         });
     }
 
 
-    // Add event listeners to assigned person and title inputs to update state
+    // Add event listeners to assigned person and title inputs to update state in real-time
     const assignedPersonInput = section.querySelector('.assigned-person');
     if (assignedPersonInput) {
         assignedPersonInput.addEventListener('input', (event) => {
              if (meetingState[key]) {
+                 // Update state, using placeholder as fallback if input is cleared
                  meetingState[key].assignedPerson = event.target.value.trim() || event.target.placeholder.trim();
              }
         });
-         // Initialize state from input values on load
-         if (meetingState[key]) {
-              meetingState[key].assignedPerson = assignedPersonInput.value.trim() || assignedPersonInput.placeholder.trim();
-         }
+         // Initialize state from input values on load (already done in initializeMeetingState)
     }
 
     const sectionTitleInput = section.querySelector('.section-title');
     if (sectionTitleInput) {
         sectionTitleInput.addEventListener('input', (event) => {
              if (meetingState[key]) {
+                 // Update state, using placeholder as fallback if input is cleared
                  meetingState[key].sectionTitle = event.target.value.trim() || event.target.placeholder.trim();
              }
         });
-         // Initialize state from input values on load
-         if (meetingState[key]) {
-             meetingState[key].sectionTitle = sectionTitleInput.value.trim() || sectionTitleInput.placeholder.trim();
-         }
+         // Initialize state from input values on load (already done in initializeMeetingState)
     }
 });
 
 
 // --- INITIALIZATION ---
 
+// Use DOMContentLoaded to ensure the HTML is fully parsed before running scripts
 window.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded. Initializing app.");
     initializeMeetingState();
-    updateScheduledTimes(); // Calculate initial scheduled times on load based on initial input values
+    // updateScheduledTimes() is called within initializeMeetingState now after state setup
 });
 
-// Optional: Service Worker registration (requires sw.js file)
+// Optional: Service Worker registration (requires sw.js file and configuration)
 // if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.register('/sw.js')
-//     .then(() => console.log("Service Worker registered"))
-//     .catch(err => console.log("Error in Service Worker:", err));
+//   window.addEventListener('load', () => { // Register after page load
+//     navigator.serviceWorker.register('/sw.js')
+//       .then(registration => {
+//         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+//       })
+//       .catch(error => {
+//         console.log('ServiceWorker registration failed: ', error);
+//       });
+//   });
 // }
